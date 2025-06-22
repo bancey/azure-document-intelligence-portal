@@ -1,0 +1,15 @@
+This is a test document for Azure Document Intelligence analysis.
+
+Sample Invoice
+==============
+Invoice Number: INV-001
+Date: June 22, 2025
+Customer: Test Customer
+Amount: $100.00
+
+Description: Test service
+Quantity: 1
+Unit Price: $100.00
+Total: $100.00
+
+Thank you for your business!

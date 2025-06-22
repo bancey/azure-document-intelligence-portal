@@ -1,0 +1,24 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "resourceGroupName": {
+      "value": "rg-${AZURE_ENV_NAME}"
+    },
+    "location": {
+      "value": "uksouth"
+    },
+    "storageAccountName": {
+      "value": "${AZURE_ENV_NAME}storage"
+    },
+    "documentIntelligenceAccountName": {
+      "value": "${AZURE_ENV_NAME}-doc-intel"
+    },
+    "webAppName": {
+      "value": "${AZURE_ENV_NAME}-web"
+    },
+    "environmentName": {
+      "value": "${AZURE_ENV_NAME}"
+    }
+  }
+}

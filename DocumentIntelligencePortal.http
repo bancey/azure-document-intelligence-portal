@@ -1,0 +1,57 @@
+@DocumentIntelligencePortal_HostAddress = http://localhost:5162
+
+# Test WeatherForecast endpoint
+GET {{DocumentIntelligencePortal_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
+
+# List storage containers
+GET {{DocumentIntelligencePortal_HostAddress}}/api/storage/containers
+Accept: application/json
+
+###
+
+# List documents in a container
+GET {{DocumentIntelligencePortal_HostAddress}}/api/storage/documents?containerName=documents
+Accept: application/json
+
+###
+
+# Analyze document from storage using streaming (recommended approach)
+POST {{DocumentIntelligencePortal_HostAddress}}/api/documentanalysis/analyze/stream
+Content-Type: application/json
+
+{
+  "containerName": "documents",
+  "blobName": "sample.pdf",
+  "modelId": "prebuilt-document",
+  "includeFieldElements": true
+}
+
+###
+
+# Analyze document from storage using path parameters (alternative)
+POST {{DocumentIntelligencePortal_HostAddress}}/api/documentanalysis/analyze/stream/documents/sample.pdf?modelId=prebuilt-document
+Content-Type: application/json
+
+###
+
+# Get available Document Intelligence models
+GET {{DocumentIntelligencePortal_HostAddress}}/api/documentanalysis/models
+Accept: application/json
+
+###
+
+# Test the updated UI workflow - Analyze document using the same method as the UI
+POST {{DocumentIntelligencePortal_HostAddress}}/api/documentanalysis/analyze/stream
+Content-Type: application/json
+
+{
+  "containerName": "documents",
+  "blobName": "sample.pdf",
+  "modelId": "prebuilt-invoice",
+  "includeFieldElements": true
+}
+
+###

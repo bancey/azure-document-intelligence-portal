@@ -1,0 +1,30 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DocumentIntelligencePortal", "src\DocumentIntelligencePortal\DocumentIntelligencePortal.csproj", "{D2949557-6C68-30AB-74A1-9EE0FE96739A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DocumentIntelligencePortal.Tests", "tests\DocumentIntelligencePortal.Tests\DocumentIntelligencePortal.Tests.csproj", "{B5A5E5F5-8E3D-4F2C-9A1B-2C3D4E5F6A7B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D2949557-6C68-30AB-74A1-9EE0FE96739A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2949557-6C68-30AB-74A1-9EE0FE96739A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2949557-6C68-30AB-74A1-9EE0FE96739A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D2949557-6C68-30AB-74A1-9EE0FE96739A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5A5E5F5-8E3D-4F2C-9A1B-2C3D4E5F6A7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5A5E5F5-8E3D-4F2C-9A1B-2C3D4E5F6A7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5A5E5F5-8E3D-4F2C-9A1B-2C3D4E5F6A7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5A5E5F5-8E3D-4F2C-9A1B-2C3D4E5F6A7B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3835BB0A-3D0D-4095-B37E-D09AC97D0801}
+	EndGlobalSection
+EndGlobal
