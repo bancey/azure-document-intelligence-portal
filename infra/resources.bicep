@@ -308,7 +308,7 @@ resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
 }
 
 // Web App
-resource webApp 'Microsoft.Web/sites@2023-01-01' = {
+resource webApp 'Microsoft.Web/sites@2024-11-01' = {
   name: '${webAppName}-${resourceToken}'
   location: location
   identity: {
