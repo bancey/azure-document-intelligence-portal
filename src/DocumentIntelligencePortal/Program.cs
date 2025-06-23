@@ -1,8 +1,6 @@
 using DocumentIntelligencePortal.Services;
 using Serilog;
 using Serilog.Events;
-using Microsoft.ApplicationInsights.Extensibility;
-using Microsoft.OpenApi.Models;
 
 // Configure Serilog for structured logging
 Log.Logger = new LoggerConfiguration()

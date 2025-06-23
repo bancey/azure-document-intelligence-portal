@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
 using DocumentIntelligencePortal.Models;
 using DocumentIntelligencePortal.Services;
 

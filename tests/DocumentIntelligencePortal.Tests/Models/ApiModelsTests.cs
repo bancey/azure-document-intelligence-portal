@@ -1,8 +1,3 @@
-using Xunit;
-using FluentAssertions;
-using DocumentIntelligencePortal.Models;
-using DocumentIntelligencePortal.Tests.Fixtures;
-
 namespace DocumentIntelligencePortal.Tests.Models;
 
 /// <summary>

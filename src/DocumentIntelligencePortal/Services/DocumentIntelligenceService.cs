@@ -2,7 +2,6 @@ using Azure;
 using Azure.AI.FormRecognizer.DocumentAnalysis;
 using Azure.Identity;
 using DocumentIntelligencePortal.Models;
-using Microsoft.Extensions.Configuration;
 using DocumentAnalysisResult = DocumentIntelligencePortal.Models.DocumentAnalysisResult;
 using DocumentPage = DocumentIntelligencePortal.Models.DocumentPage;
 using DocumentLine = DocumentIntelligencePortal.Models.DocumentLine;

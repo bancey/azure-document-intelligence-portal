@@ -2,7 +2,6 @@ using Azure.Identity;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using DocumentIntelligencePortal.Models;
-using Microsoft.Extensions.Configuration;
 
 namespace DocumentIntelligencePortal.Services;
 

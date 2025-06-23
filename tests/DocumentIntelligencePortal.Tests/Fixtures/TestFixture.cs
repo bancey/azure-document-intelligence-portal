@@ -1,10 +1,5 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Moq;
-using Azure.Storage.Blobs;
-using Azure.AI.FormRecognizer.DocumentAnalysis;
-using DocumentIntelligencePortal.Services;
 
 namespace DocumentIntelligencePortal.Tests.Fixtures;
 
