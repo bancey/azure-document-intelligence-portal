@@ -124,7 +124,7 @@ resource documentIntelligenceAccount 'Microsoft.CognitiveServices/accounts@2023-
 }
 
 // App Service Plan
-resource appServicePlan 'Microsoft.Web/serverfarms@2023-01-01' = {
+resource appServicePlan 'Microsoft.Web/serverfarms@2024-11-01' = {
   name: '${appServicePlanName}-${resourceToken}'
   location: location
   sku: {
