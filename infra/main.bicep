@@ -36,7 +36,7 @@ param environmentName string = 'dev'
 param resourceToken string = uniqueString(subscription().id, environmentName)
 
 // Create the resource group
-resource resourceGroup 'Microsoft.Resources/resourceGroups@2023-07-01' = {
+resource resourceGroup 'Microsoft.Resources/resourceGroups@2025-04-01' = {
   name: resourceGroupName
   location: location
   tags: {
