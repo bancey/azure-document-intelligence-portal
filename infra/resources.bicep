@@ -151,7 +151,7 @@ resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@
 }
 
 // Private Endpoint for Storage Account (Blob)
-resource storagePrivateEndpoint 'Microsoft.Network/privateEndpoints@2024-05-01' = {
+resource storagePrivateEndpoint 'Microsoft.Network/privateEndpoints@2024-07-01' = {
   name: 'pe-storage-${resourceToken}'
   location: location
   properties: {
@@ -214,7 +214,7 @@ resource storageDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneG
 }
 
 // Private Endpoint for Document Intelligence
-resource documentIntelligencePrivateEndpoint 'Microsoft.Network/privateEndpoints@2024-05-01' = {
+resource documentIntelligencePrivateEndpoint 'Microsoft.Network/privateEndpoints@2024-07-01' = {
   name: 'pe-docint-${resourceToken}'
   location: location
   properties: {
