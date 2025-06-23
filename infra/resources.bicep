@@ -198,7 +198,7 @@ resource storageDnsZoneVnetLink 'Microsoft.Network/privateDnsZones/virtualNetwor
 }
 
 // DNS Zone Group for Storage Private Endpoint
-resource storageDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2024-05-01' = {
+resource storageDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2024-07-01' = {
   parent: storagePrivateEndpoint
   name: 'storage-dns-zone-group'
   properties: {
@@ -261,7 +261,7 @@ resource documentIntelligenceDnsZoneVnetLink 'Microsoft.Network/privateDnsZones/
 }
 
 // DNS Zone Group for Document Intelligence Private Endpoint
-resource documentIntelligenceDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2024-05-01' = {
+resource documentIntelligenceDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2024-07-01' = {
   parent: documentIntelligencePrivateEndpoint
   name: 'docint-dns-zone-group'
   properties: {
