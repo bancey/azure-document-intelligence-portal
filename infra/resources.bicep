@@ -141,7 +141,7 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2024-11-01' = {
 }
 
 // User-assigned Managed Identity
-resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
+resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' = {
   name: 'id-document-intelligence-portal-${resourceToken}'
   location: location
   tags: {
