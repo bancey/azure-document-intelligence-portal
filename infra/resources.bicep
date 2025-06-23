@@ -277,7 +277,7 @@ resource documentIntelligenceDnsZoneGroup 'Microsoft.Network/privateEndpoints/pr
 }
 
 // Log Analytics Workspace
-resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
+resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2025-02-01' = {
   name: 'log-document-intelligence-portal-${resourceToken}'
   location: location
   properties: {
