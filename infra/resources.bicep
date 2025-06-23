@@ -28,7 +28,7 @@ param environmentName string
 param resourceToken string
 
 // Virtual Network for private networking
-resource virtualNetwork 'Microsoft.Network/virtualNetworks@2024-05-01' = {
+resource virtualNetwork 'Microsoft.Network/virtualNetworks@2024-07-01' = {
   name: 'vnet-document-intelligence-portal-${resourceToken}'
   location: location
   properties: {
