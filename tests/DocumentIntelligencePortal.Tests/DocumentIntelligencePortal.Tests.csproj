@@ -27,7 +27,7 @@
     <PackageReference Include="Azure.AI.FormRecognizer" Version="4.1.0" />
     <PackageReference Include="Azure.Identity" Version="1.14.1" />
     <PackageReference Include="Azure.Storage.Blobs" Version="12.24.1" />
-    <PackageReference Include="Testcontainers.Azurite" Version="3.10.0" />
+    <PackageReference Include="Testcontainers.Azurite" Version="4.6.0" />
   </ItemGroup>
 
   <ItemGroup>
