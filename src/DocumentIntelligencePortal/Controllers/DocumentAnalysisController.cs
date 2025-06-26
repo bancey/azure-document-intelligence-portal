@@ -58,7 +58,7 @@ public class DocumentAnalysisController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error analyzing document: {BlobUri}", request.BlobUri);
+            _logger.LogError(ex, "Error analyzing document: {BlobUri}", request is null ? "null" : request.BlobUri);
             return StatusCode(500, new AnalyzeDocumentResponse 
             { 
                 Success = false, 
@@ -113,8 +113,9 @@ public class DocumentAnalysisController : ControllerBase
             
             return BadRequest(result);
         }
-        catch (FileNotFoundException)
+        catch (FileNotFoundException ex)
         {
+            _logger.LogError(ex, "Document not found: {Container}/{Blob}", containerName, blobName);
             return NotFound(new AnalyzeDocumentResponse 
             { 
                 Success = false, 
@@ -187,39 +188,6 @@ public class DocumentAnalysisController : ControllerBase
     }
 
     /// <summary>
-    /// Test endpoint to generate logs and verify Application Insights integration
-    /// </summary>
-    [HttpGet("test")]
-    public IActionResult Test()
-    {
-        _logger.LogInformation("Test endpoint called at {Timestamp}", DateTime.UtcNow);
-        _logger.LogWarning("This is a test warning log for Application Insights verification");
-        
-        try
-        {
-            // Simulate some processing
-            var random = new Random();
-            var processTime = random.Next(100, 500);
-            Thread.Sleep(processTime);
-            
-            _logger.LogInformation("Test processing completed in {ProcessTime}ms", processTime);
-            
-            return Ok(new
-            {
-                Message = "Test endpoint is working correctly",
-                Timestamp = DateTime.UtcNow,
-                ProcessingTimeMs = processTime,
-                ApplicationInsightsEnabled = true
-            });
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error in test endpoint");
-            return StatusCode(500, "Test endpoint error");
-        }
-    }
-
-    /// <summary>
     /// Analyzes a document uploaded via multipart form data using Document Intelligence
     /// </summary>
     /// <param name="file">The uploaded document file</param>
@@ -236,12 +204,12 @@ public class DocumentAnalysisController : ControllerBase
                 file.FileName, file.Length, modelId);
 
             // Validate file
-            if (file == null || file.Length == 0)
+            if (file.Length == 0)
             {
                 return BadRequest(new AnalyzeDocumentResponse 
                 { 
                     Success = false, 
-                    Message = "No file uploaded" 
+                    Message = "No file uploaded or file is of zero size." 
                 });
             }
 
@@ -373,12 +341,13 @@ public class DocumentAnalysisController : ControllerBase
                 return BadRequest(result);
             }
         }
-        catch (FileNotFoundException)
+        catch (FileNotFoundException ex)
         {
-            return NotFound(new AnalyzeDocumentResponse 
-            { 
-                Success = false, 
-                Message = $"Document not found: {containerName}/{blobName}" 
+            _logger.LogError(ex, "Document not found: {Container}/{Blob}", containerName, blobName);
+            return NotFound(new AnalyzeDocumentResponse
+            {
+                Success = false,
+                Message = $"Document not found: {containerName}/{blobName}"
             });
         }
         catch (Exception ex)
@@ -443,9 +412,9 @@ public class DocumentAnalysisController : ControllerBase
                 request.ContainerName, request.BlobName, result.Message);
             return BadRequest(result);
         }
-        catch (FileNotFoundException)
+        catch (FileNotFoundException ex)
         {
-            _logger.LogWarning("Document not found: {Container}/{Blob}", request.ContainerName, request.BlobName);
+            _logger.LogError(ex, "Document not found: {Container}/{Blob}", request.ContainerName, request.BlobName);
             return NotFound(new AnalyzeDocumentResponse 
             { 
                 Success = false, 
