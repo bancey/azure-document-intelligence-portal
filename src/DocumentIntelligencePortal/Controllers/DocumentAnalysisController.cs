@@ -35,10 +35,7 @@ public class DocumentAnalysisController : ControllerBase
     {
         try
         {
-            _logger.LogInformation("Analyzing document: {BlobUri} with model: {ModelId}", 
-                request.BlobUri, request.ModelId);
-
-            if (string.IsNullOrWhiteSpace(request.BlobUri))
+            if (request == null || string.IsNullOrWhiteSpace(request.BlobUri))
             {
                 return BadRequest(new AnalyzeDocumentResponse 
                 { 
@@ -46,6 +43,9 @@ public class DocumentAnalysisController : ControllerBase
                     Message = "Blob URI is required" 
                 });
             }
+
+            _logger.LogInformation("Analyzing document: {BlobUri} with model: {ModelId}", 
+                request.BlobUri, request.ModelId);
 
             var result = await _documentIntelligenceService.AnalyzeDocumentAsync(request);
             

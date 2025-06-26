@@ -53,12 +53,34 @@ public class DocumentAnalysisControllerTests : IClassFixture<TestFixture>
     [Theory]
     [InlineData("")]
     [InlineData(" ")]
-    [InlineData(null)]
     public async Task AnalyzeDocument_WithInvalidBlobUri_ShouldReturnBadRequest(string? blobUri)
     {
         // Arrange
         var controller = CreateController();
         var request = TestDataFactory.CreateAnalyzeDocumentRequest(blobUri: blobUri);
+
+        // Act
+        var result = await controller.AnalyzeDocument(request);
+
+        // Assert
+        result.Should().NotBeNull();
+        var badRequestResult = result.Result.Should().BeOfType<BadRequestObjectResult>().Subject;
+        var response = badRequestResult.Value.Should().BeOfType<AnalyzeDocumentResponse>().Subject;
+        response.Success.Should().BeFalse();
+        response.Message.Should().Contain("Blob URI is required");
+    }
+
+    [Fact]
+    public async Task AnalyzeDocument_WithNullBlobUri_ShouldReturnBadRequest()
+    {
+        // Arrange
+        var controller = CreateController();
+        var request = new AnalyzeDocumentRequest
+        {
+            BlobUri = null,
+            ModelId = "prebuilt-document",
+            IncludeFieldElements = true
+        };
 
         // Act
         var result = await controller.AnalyzeDocument(request);
