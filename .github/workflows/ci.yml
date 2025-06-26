@@ -46,13 +46,12 @@ jobs:
       run: |
         mkdir -p ./.sonar/scanner
         dotnet tool update dotnet-sonarscanner --tool-path ./.sonar/scanner
-    - name: Build and analyze
+    - name: Build, test and analyze
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       shell: bash
       run: |
-        ./.sonar/scanner/dotnet-sonarscanner begin /k:"bancey_azure-document-intelligence-portal" /o:"bancey" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
+        ./.sonar/scanner/dotnet-sonarscanner begin /k:"bancey_azure-document-intelligence-portal" /o:"bancey" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.coverage.exclusions="**/bin/**,**/obj/**,**/*.csproj,**/*.sln,**/*.md,**/*.yml,**/*.yaml,**/*.json,**/*.xml,**/Dockerfile,**/docker-compose.yml,**/docker-compose.override.yml"
         dotnet build --no-restore
+        dotnet test --no-build --verbosity normal --collect:"XPlat Code Coverage"
         ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
