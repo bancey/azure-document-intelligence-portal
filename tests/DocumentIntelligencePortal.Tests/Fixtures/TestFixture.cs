@@ -50,12 +50,12 @@ public class TestFixture : IDisposable
 public static class TestDataFactory
 {
     public static AnalyzeDocumentRequest CreateAnalyzeDocumentRequest(
-        string? blobUri = null,
+        string? blobUri = "UNSET",
         string? modelId = null)
     {
         return new AnalyzeDocumentRequest
         {
-            BlobUri = blobUri ?? "https://teststorage.blob.core.windows.net/test-container/test-document.pdf",
+            BlobUri = blobUri == "UNSET" ? "https://teststorage.blob.core.windows.net/test-container/test-document.pdf" : blobUri!,
             ModelId = modelId ?? "prebuilt-document",
             IncludeFieldElements = true
         };
@@ -75,14 +75,14 @@ public static class TestDataFactory
     }
 
     public static AnalyzeDocumentFromStorageRequest CreateAnalyzeDocumentFromStorageRequest(
-        string? containerName = null,
-        string? blobName = null,
+        string? containerName = "UNSET",
+        string? blobName = "UNSET",
         string? modelId = null)
     {
         return new AnalyzeDocumentFromStorageRequest
         {
-            ContainerName = containerName ?? "test-container",
-            BlobName = blobName ?? "test-document.pdf",
+            ContainerName = containerName == "UNSET" ? "test-container" : containerName!,
+            BlobName = blobName == "UNSET" ? "test-document.pdf" : blobName!,
             ModelId = modelId ?? "prebuilt-document",
             IncludeFieldElements = true
         };

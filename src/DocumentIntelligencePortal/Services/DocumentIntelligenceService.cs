@@ -60,6 +60,16 @@ public class DocumentIntelligenceService : IDocumentIntelligenceService
     {
         try
         {
+            // Validate input parameters
+            if (string.IsNullOrWhiteSpace(request.BlobUri))
+            {
+                return new AnalyzeDocumentResponse
+                {
+                    Success = false,
+                    Message = "Blob URI is required"
+                };
+            }
+
             _logger.LogInformation("Starting document analysis for: {BlobUri} with model: {ModelId}", 
                 request.BlobUri, request.ModelId);
 
@@ -120,7 +130,7 @@ public class DocumentIntelligenceService : IDocumentIntelligenceService
                 return new AnalyzeDocumentResponse
                 {
                     Success = false,
-                    Message = "Document stream is empty or null"
+                    Message = "Document stream is required"
                 };
             }
 
@@ -446,21 +456,12 @@ public class DocumentIntelligenceService : IDocumentIntelligenceService
                 request.ContainerName, request.BlobName, request.ModelId);
 
             // Validate input parameters
-            if (string.IsNullOrEmpty(request.ContainerName))
+            if (string.IsNullOrWhiteSpace(request.ContainerName) || string.IsNullOrWhiteSpace(request.BlobName))
             {
                 return new AnalyzeDocumentResponse
                 {
                     Success = false,
-                    Message = "Container name is required"
-                };
-            }
-
-            if (string.IsNullOrEmpty(request.BlobName))
-            {
-                return new AnalyzeDocumentResponse
-                {
-                    Success = false,
-                    Message = "Blob name is required"
+                    Message = "Container name and blob name are required"
                 };
             }
 
