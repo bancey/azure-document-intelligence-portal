@@ -11,44 +11,17 @@ namespace DocumentIntelligencePortal.Tests.Integration;
 /// Integration tests that verify the complete application pipeline
 /// These tests use TestServer to test the actual HTTP endpoints
 /// </summary>
-public class ApplicationIntegrationTests : IClassFixture<WebApplicationFactory<Program>>
+public class ApplicationIntegrationTests
 {
-    private readonly WebApplicationFactory<Program> _factory;
-    private readonly HttpClient _client;
-
-    public ApplicationIntegrationTests(WebApplicationFactory<Program> factory)
-    {
-        _factory = factory.WithWebHostBuilder(builder =>
-        {
-            builder.ConfigureAppConfiguration((context, config) =>
-            {
-                // Override configuration for testing
-                config.AddInMemoryCollection(new Dictionary<string, string?>
-                {
-                    ["Azure:DocumentIntelligence:Endpoint"] = "https://test-document-intelligence.cognitiveservices.azure.com/",
-                    ["Azure:StorageAccountName"] = "teststorageaccount",
-                    ["Logging:LogLevel:Default"] = "Warning" // Reduce log noise in tests
-                });
-            });
-
-            builder.ConfigureServices(services =>
-            {
-                // Here you could replace real Azure services with mocks for testing
-                // This is useful for testing without requiring actual Azure resources
-            });
-        });
-
-        _client = _factory.CreateClient();
-    }
-
     [Fact]
     public async Task HealthCheck_ShouldReturnOk()
     {
-        // This test assumes you have a health check endpoint
-        // You might want to add one to your application
+        // Arrange
+        using var factory = new WebApplicationFactory<Program>();
+        using var client = factory.CreateClient();
 
         // Act
-        var response = await _client.GetAsync("/");
+        var response = await client.GetAsync("/");
 
         // Assert
         response.StatusCode.Should().BeOneOf(HttpStatusCode.OK, HttpStatusCode.NotFound);
@@ -58,8 +31,12 @@ public class ApplicationIntegrationTests : IClassFixture<WebApplicationFactory<P
     [Fact]
     public async Task SwaggerEndpoint_ShouldReturnSwaggerUI()
     {
+        // Arrange
+        using var factory = new WebApplicationFactory<Program>();
+        using var client = factory.CreateClient();
+
         // Act
-        var response = await _client.GetAsync("/swagger");
+        var response = await client.GetAsync("/swagger");
 
         // Assert
         response.StatusCode.Should().BeOneOf(HttpStatusCode.OK, HttpStatusCode.MovedPermanently, HttpStatusCode.Found);
@@ -69,43 +46,44 @@ public class ApplicationIntegrationTests : IClassFixture<WebApplicationFactory<P
     public async Task DocumentAnalysis_AnalyzeDocument_WithValidRequest_ShouldReturnResponse()
     {
         // Arrange
-        var factory = _factory.WithWebHostBuilder(builder =>
-        {
-            builder.ConfigureServices(services =>
+        using var factory = new WebApplicationFactory<Program>()
+            .WithWebHostBuilder(builder =>
             {
-                // Remove existing services and add mocks
-                var storageServiceDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(IAzureStorageService));
-                if (storageServiceDescriptor != null)
+                builder.ConfigureServices(services =>
                 {
-                    services.Remove(storageServiceDescriptor);
-                }
-                
-                var docIntelligenceServiceDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(IDocumentIntelligenceService));
-                if (docIntelligenceServiceDescriptor != null)
-                {
-                    services.Remove(docIntelligenceServiceDescriptor);
-                }
-
-                // Add mock services
-                var mockStorageService = new Mock<IAzureStorageService>();
-                var mockDocIntelligenceService = new Mock<IDocumentIntelligenceService>();
-                
-                mockDocIntelligenceService
-                    .Setup(x => x.AnalyzeDocumentAsync(It.IsAny<AnalyzeDocumentRequest>()))
-                    .ReturnsAsync(new AnalyzeDocumentResponse
+                    // Remove existing services and add mocks
+                    var storageServiceDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(IAzureStorageService));
+                    if (storageServiceDescriptor != null)
                     {
-                        Success = true,
-                        OperationId = Guid.NewGuid().ToString(),
-                        Result = TestDataFactory.CreateDocumentAnalysisResult(),
-                        Message = "Analysis completed successfully"
-                    });
+                        services.Remove(storageServiceDescriptor);
+                    }
+                    
+                    var docIntelligenceServiceDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(IDocumentIntelligenceService));
+                    if (docIntelligenceServiceDescriptor != null)
+                    {
+                        services.Remove(docIntelligenceServiceDescriptor);
+                    }
 
-                services.AddSingleton(mockStorageService.Object);
-                services.AddSingleton(mockDocIntelligenceService.Object);
+                    // Add mock services
+                    var mockStorageService = new Mock<IAzureStorageService>();
+                    var mockDocIntelligenceService = new Mock<IDocumentIntelligenceService>();
+                    
+                    mockDocIntelligenceService
+                        .Setup(x => x.AnalyzeDocumentAsync(It.IsAny<AnalyzeDocumentRequest>()))
+                        .ReturnsAsync(new AnalyzeDocumentResponse
+                        {
+                            Success = true,
+                            OperationId = Guid.NewGuid().ToString(),
+                            Result = TestDataFactory.CreateDocumentAnalysisResult(),
+                            Message = "Analysis completed successfully"
+                        });
+
+                    services.AddSingleton(mockStorageService.Object);
+                    services.AddSingleton(mockDocIntelligenceService.Object);
+                });
             });
-        });
 
-        var client = factory.CreateClient();
+        using var client = factory.CreateClient();
         var request = new AnalyzeDocumentRequest
         {
             BlobUri = "https://teststorage.blob.core.windows.net/test-container/test-document.pdf",
@@ -135,31 +113,32 @@ public class ApplicationIntegrationTests : IClassFixture<WebApplicationFactory<P
     public async Task Storage_GetContainers_ShouldReturnContainerList()
     {
         // Arrange
-        var factory = _factory.WithWebHostBuilder(builder =>
-        {
-            builder.ConfigureServices(services =>
+        using var factory = new WebApplicationFactory<Program>()
+            .WithWebHostBuilder(builder =>
             {
-                // Remove existing storage service and add mock
-                var storageServiceDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(IAzureStorageService));
-                if (storageServiceDescriptor != null)
+                builder.ConfigureServices(services =>
                 {
-                    services.Remove(storageServiceDescriptor);
-                }
-
-                var mockStorageService = new Mock<IAzureStorageService>();
-                mockStorageService
-                    .Setup(x => x.ListContainersAsync())
-                    .ReturnsAsync(new ListContainersResponse
+                    // Remove existing storage service and add mock
+                    var storageServiceDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(IAzureStorageService));
+                    if (storageServiceDescriptor != null)
                     {
-                        Success = true,
-                        Containers = new List<string> { "test-container", "documents" }
-                    });
+                        services.Remove(storageServiceDescriptor);
+                    }
 
-                services.AddSingleton(mockStorageService.Object);
+                    var mockStorageService = new Mock<IAzureStorageService>();
+                    mockStorageService
+                        .Setup(x => x.ListContainersAsync())
+                        .ReturnsAsync(new ListContainersResponse
+                        {
+                            Success = true,
+                            Containers = new List<string> { "test-container", "documents" }
+                        });
+
+                    services.AddSingleton(mockStorageService.Object);
+                });
             });
-        });
 
-        var client = factory.CreateClient();
+        using var client = factory.CreateClient();
 
         // Act
         var response = await client.GetAsync("/api/storage/containers");
@@ -184,6 +163,9 @@ public class ApplicationIntegrationTests : IClassFixture<WebApplicationFactory<P
     public async Task Endpoints_ShouldBeRoutedCorrectly(string endpoint, string method)
     {
         // Arrange
+        using var factory = new WebApplicationFactory<Program>();
+        using var client = factory.CreateClient();
+        
         var request = new HttpRequestMessage(new HttpMethod(method), endpoint);
         
         if (method == "POST")
@@ -198,7 +180,7 @@ public class ApplicationIntegrationTests : IClassFixture<WebApplicationFactory<P
         }
 
         // Act
-        var response = await _client.SendAsync(request);
+        var response = await client.SendAsync(request);
 
         // Assert
         // We're not testing the full functionality here, just that the routes exist
@@ -209,8 +191,12 @@ public class ApplicationIntegrationTests : IClassFixture<WebApplicationFactory<P
     [Fact]
     public async Task Application_ShouldHaveCorrectContentType()
     {
+        // Arrange
+        using var factory = new WebApplicationFactory<Program>();
+        using var client = factory.CreateClient();
+
         // Act
-        var response = await _client.GetAsync("/api/storage/containers");
+        var response = await client.GetAsync("/api/storage/containers");
 
         // Assert
         if (response.Content.Headers.ContentType != null)
@@ -223,10 +209,12 @@ public class ApplicationIntegrationTests : IClassFixture<WebApplicationFactory<P
     public async Task Application_ShouldHandleCORS()
     {
         // Arrange
-        _client.DefaultRequestHeaders.Add("Origin", "https://localhost:3000");
+        using var factory = new WebApplicationFactory<Program>();
+        using var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Add("Origin", "https://localhost:3000");
 
         // Act
-        var response = await _client.GetAsync("/api/storage/containers");
+        var response = await client.GetAsync("/api/storage/containers");
 
         // Assert
         // Check if CORS headers are present (this depends on your CORS configuration)
