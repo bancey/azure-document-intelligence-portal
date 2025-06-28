@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using System.Net;
+using System.Net.Http.Json;
 using System.Text.Json;
 
 namespace DocumentIntelligencePortal.Tests.Integration;
@@ -63,14 +65,47 @@ public class ApplicationIntegrationTests : IClassFixture<WebApplicationFactory<P
         response.StatusCode.Should().BeOneOf(HttpStatusCode.OK, HttpStatusCode.MovedPermanently, HttpStatusCode.Found);
     }
 
-    [Fact(Skip = "Requires actual Azure services or comprehensive mocking")]
+    [Fact]
     public async Task DocumentAnalysis_AnalyzeDocument_WithValidRequest_ShouldReturnResponse()
     {
-        // This test would require either:
-        // 1. Actual Azure Document Intelligence service (for full integration tests)
-        // 2. Comprehensive mocking of Azure services (for isolated tests)
-
         // Arrange
+        var factory = _factory.WithWebHostBuilder(builder =>
+        {
+            builder.ConfigureServices(services =>
+            {
+                // Remove existing services and add mocks
+                var storageServiceDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(IAzureStorageService));
+                if (storageServiceDescriptor != null)
+                {
+                    services.Remove(storageServiceDescriptor);
+                }
+                
+                var docIntelligenceServiceDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(IDocumentIntelligenceService));
+                if (docIntelligenceServiceDescriptor != null)
+                {
+                    services.Remove(docIntelligenceServiceDescriptor);
+                }
+
+                // Add mock services
+                var mockStorageService = new Mock<IAzureStorageService>();
+                var mockDocIntelligenceService = new Mock<IDocumentIntelligenceService>();
+                
+                mockDocIntelligenceService
+                    .Setup(x => x.AnalyzeDocumentAsync(It.IsAny<AnalyzeDocumentRequest>()))
+                    .ReturnsAsync(new AnalyzeDocumentResponse
+                    {
+                        Success = true,
+                        OperationId = Guid.NewGuid().ToString(),
+                        Result = TestDataFactory.CreateDocumentAnalysisResult(),
+                        Message = "Analysis completed successfully"
+                    });
+
+                services.AddSingleton(mockStorageService.Object);
+                services.AddSingleton(mockDocIntelligenceService.Object);
+            });
+        });
+
+        var client = factory.CreateClient();
         var request = new AnalyzeDocumentRequest
         {
             BlobUri = "https://teststorage.blob.core.windows.net/test-container/test-document.pdf",
@@ -81,26 +116,66 @@ public class ApplicationIntegrationTests : IClassFixture<WebApplicationFactory<P
         var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
 
         // Act
-        var response = await _client.PostAsync("/api/documentanalysis/analyze", content);
+        var response = await client.PostAsync("/api/documentanalysis/analyze", content);
 
         // Assert
-        // The exact assertion would depend on whether you're using real services or mocks
         response.Should().NotBeNull();
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        
+        var responseContent = await response.Content.ReadAsStringAsync();
+        responseContent.Should().NotBeNullOrEmpty();
+        
+        var result = JsonSerializer.Deserialize<AnalyzeDocumentResponse>(responseContent, 
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        result.Should().NotBeNull();
+        result!.Success.Should().BeTrue();
     }
 
-    [Fact(Skip = "Requires actual Azure Storage or comprehensive mocking")]
+    [Fact]
     public async Task Storage_GetContainers_ShouldReturnContainerList()
     {
-        // This test would require either:
-        // 1. Actual Azure Storage service (for full integration tests)
-        // 2. Comprehensive mocking of Azure services (for isolated tests)
+        // Arrange
+        var factory = _factory.WithWebHostBuilder(builder =>
+        {
+            builder.ConfigureServices(services =>
+            {
+                // Remove existing storage service and add mock
+                var storageServiceDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(IAzureStorageService));
+                if (storageServiceDescriptor != null)
+                {
+                    services.Remove(storageServiceDescriptor);
+                }
+
+                var mockStorageService = new Mock<IAzureStorageService>();
+                mockStorageService
+                    .Setup(x => x.ListContainersAsync())
+                    .ReturnsAsync(new ListContainersResponse
+                    {
+                        Success = true,
+                        Containers = new List<string> { "test-container", "documents" }
+                    });
+
+                services.AddSingleton(mockStorageService.Object);
+            });
+        });
+
+        var client = factory.CreateClient();
 
         // Act
-        var response = await _client.GetAsync("/api/storage/containers");
+        var response = await client.GetAsync("/api/storage/containers");
 
         // Assert
-        // The exact assertion would depend on whether you're using real services or mocks
         response.Should().NotBeNull();
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        
+        var responseContent = await response.Content.ReadAsStringAsync();
+        var result = JsonSerializer.Deserialize<ListContainersResponse>(responseContent,
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        
+        result.Should().NotBeNull();
+        result!.Success.Should().BeTrue();
+        result.Containers.Should().NotBeNull();
+        result.Containers.Should().Contain("test-container");
     }
 
     [Theory]
