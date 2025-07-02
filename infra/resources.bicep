@@ -101,7 +101,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2024-01-01' = {
 }
 
 // Document Intelligence Service with private networking
-resource documentIntelligenceAccount 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
+resource documentIntelligenceAccount 'Microsoft.CognitiveServices/accounts@2025-06-01' = {
   name: '${documentIntelligenceAccountName}-${resourceToken}'
   location: location
   sku: {
