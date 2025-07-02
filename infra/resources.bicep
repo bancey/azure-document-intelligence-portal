@@ -68,7 +68,7 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2024-07-01' = {
 }
 
 // Storage Account with private networking
-resource storageAccount 'Microsoft.Storage/storageAccounts@2024-01-01' = {
+resource storageAccount 'Microsoft.Storage/storageAccounts@2025-01-01' = {
   name: '${storageAccountName}${resourceToken}'
   location: location
   sku: {
