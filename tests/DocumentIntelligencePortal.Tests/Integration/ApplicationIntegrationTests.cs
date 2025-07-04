@@ -32,7 +32,36 @@ public class ApplicationIntegrationTests
     public async Task SwaggerEndpoint_ShouldReturnSwaggerUI()
     {
         // Arrange
-        using var factory = new WebApplicationFactory<Program>();
+        using var factory = new WebApplicationFactory<Program>()
+            .WithWebHostBuilder(builder =>
+            {
+                builder.ConfigureAppConfiguration((context, config) =>
+                {
+                    config.AddJsonFile("appsettings.Test.json", optional: false);
+                });
+                builder.ConfigureServices(services =>
+                {
+                    // Remove existing services and add mocks to avoid Azure credential issues
+                    var storageServiceDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(IAzureStorageService));
+                    if (storageServiceDescriptor != null)
+                    {
+                        services.Remove(storageServiceDescriptor);
+                    }
+                    
+                    var docIntelligenceServiceDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(IDocumentIntelligenceService));
+                    if (docIntelligenceServiceDescriptor != null)
+                    {
+                        services.Remove(docIntelligenceServiceDescriptor);
+                    }
+
+                    // Add mock services
+                    var mockStorageService = new Mock<IAzureStorageService>();
+                    var mockDocIntelligenceService = new Mock<IDocumentIntelligenceService>();
+                    
+                    services.AddSingleton(mockStorageService.Object);
+                    services.AddSingleton(mockDocIntelligenceService.Object);
+                });
+            });
         using var client = factory.CreateClient();
 
         // Act

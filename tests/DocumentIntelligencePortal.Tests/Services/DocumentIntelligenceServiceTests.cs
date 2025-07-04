@@ -1,3 +1,4 @@
+using Azure.Core;
 using Microsoft.Extensions.Configuration;
 
 namespace DocumentIntelligencePortal.Tests.Services;
@@ -11,6 +12,7 @@ public class DocumentIntelligenceServiceTests : IClassFixture<TestFixture>
     private readonly TestFixture _fixture;
     private readonly Mock<ILogger<DocumentIntelligenceService>> _mockLogger;
     private readonly Mock<IAzureStorageService> _mockStorageService;
+    private readonly Mock<IAzureCredentialProvider> _mockCredentialProvider;
     private readonly IConfiguration _configuration;
 
     public DocumentIntelligenceServiceTests(TestFixture fixture)
@@ -18,7 +20,13 @@ public class DocumentIntelligenceServiceTests : IClassFixture<TestFixture>
         _fixture = fixture;
         _mockLogger = _fixture.CreateMockLogger<DocumentIntelligenceService>();
         _mockStorageService = new Mock<IAzureStorageService>();
+        _mockCredentialProvider = new Mock<IAzureCredentialProvider>();
         _configuration = _fixture.Configuration;
+        
+        // Setup mock credential provider to return a mock credential
+        _mockCredentialProvider
+            .Setup(x => x.GetCredential())
+            .Returns(new Mock<TokenCredential>().Object);
     }
 
     [Fact]
@@ -49,7 +57,7 @@ public class DocumentIntelligenceServiceTests : IClassFixture<TestFixture>
 
         // Act & Assert
         var exception = Assert.Throws<InvalidOperationException>(() =>
-            new DocumentIntelligenceService(_mockLogger.Object, invalidConfig, _mockStorageService.Object));
+            new DocumentIntelligenceService(_mockLogger.Object, invalidConfig, _mockStorageService.Object, _mockCredentialProvider.Object));
         
         exception.Message.Should().Contain("Azure:DocumentIntelligence:Endpoint configuration is missing");
     }
@@ -301,6 +309,7 @@ public class DocumentIntelligenceServiceTests : IClassFixture<TestFixture>
         return new DocumentIntelligenceService(
             _mockLogger.Object,
             _configuration,
-            _mockStorageService.Object);
+            _mockStorageService.Object,
+            _mockCredentialProvider.Object);
     }
 }
