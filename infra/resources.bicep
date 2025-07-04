@@ -31,6 +31,10 @@ param resourceToken string
 resource virtualNetwork 'Microsoft.Network/virtualNetworks@2024-07-01' = {
   name: 'vnet-document-intelligence-portal-${resourceToken}'
   location: location
+  tags: {
+    'azd-env-name': environmentName
+    purpose: 'private-networking'
+  }
   properties: {
     addressSpace: {
       addressPrefixes: ['10.0.0.0/16']
@@ -48,7 +52,6 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2024-07-01' = {
               }
             }
           ]
-          serviceEndpoints: []
         }
       }
       {
@@ -61,10 +64,6 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2024-07-01' = {
       }
     ]
   }
-  tags: {
-    'azd-env-name': environmentName
-    purpose: 'private-networking'
-  }
 }
 
 // Storage Account with private networking
@@ -75,14 +74,18 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2024-01-01' = {
     name: 'Standard_LRS'
   }
   kind: 'StorageV2'
+  tags: {
+    'azd-env-name': environmentName
+    purpose: 'document-storage'
+  }
   properties: {
     accessTier: 'Hot'
     allowBlobPublicAccess: false
     allowSharedKeyAccess: true
     supportsHttpsTrafficOnly: true
+    minimumTlsVersion: 'TLS1_2'
     networkAcls: {
       defaultAction: 'Deny'
-      virtualNetworkRules: []
       bypass: 'AzureServices'
     }
     encryption: {
@@ -94,10 +97,6 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2024-01-01' = {
       keySource: 'Microsoft.Storage'
     }
   }
-  tags: {
-    'azd-env-name': environmentName
-    purpose: 'document-storage'
-  }
 }
 
 // Document Intelligence Service with private networking
@@ -108,18 +107,16 @@ resource documentIntelligenceAccount 'Microsoft.CognitiveServices/accounts@2024-
     name: documentIntelligenceSkuName
   }
   kind: 'FormRecognizer'
+  tags: {
+    'azd-env-name': environmentName
+    purpose: 'document-intelligence'
+  }
   properties: {
     customSubDomainName: '${documentIntelligenceAccountName}-${resourceToken}'
     networkAcls: {
       defaultAction: 'Deny'
-      virtualNetworkRules: []
-      ipRules: []
     }
     publicNetworkAccess: 'Disabled'
-  }
-  tags: {
-    'azd-env-name': environmentName
-    purpose: 'document-intelligence'
   }
 }
 
@@ -131,12 +128,12 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2024-11-01' = {
     name: 'B1'
     tier: 'Basic'
   }
-  properties: {
-    reserved: false
-  }
   tags: {
     'azd-env-name': environmentName
     purpose: 'web-hosting'
+  }
+  properties: {
+    reserved: false
   }
 }
 
@@ -154,6 +151,10 @@ resource userAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@
 resource storagePrivateEndpoint 'Microsoft.Network/privateEndpoints@2024-07-01' = {
   name: 'pe-storage-${resourceToken}'
   location: location
+  tags: {
+    'azd-env-name': environmentName
+    purpose: 'storage-private-endpoint'
+  }
   properties: {
     subnet: {
       id: virtualNetwork.properties.subnets[1].id // subnet-privateendpoints
@@ -167,10 +168,6 @@ resource storagePrivateEndpoint 'Microsoft.Network/privateEndpoints@2024-07-01' 
         }
       }
     ]
-  }
-  tags: {
-    'azd-env-name': environmentName
-    purpose: 'storage-private-endpoint'
   }
 }
 
@@ -217,6 +214,10 @@ resource storageDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneG
 resource documentIntelligencePrivateEndpoint 'Microsoft.Network/privateEndpoints@2024-07-01' = {
   name: 'pe-docint-${resourceToken}'
   location: location
+  tags: {
+    'azd-env-name': environmentName
+    purpose: 'docint-private-endpoint'
+  }
   properties: {
     subnet: {
       id: virtualNetwork.properties.subnets[1].id // subnet-privateendpoints
@@ -230,10 +231,6 @@ resource documentIntelligencePrivateEndpoint 'Microsoft.Network/privateEndpoints
         }
       }
     ]
-  }
-  tags: {
-    'azd-env-name': environmentName
-    purpose: 'docint-private-endpoint'
   }
 }
 
@@ -280,15 +277,15 @@ resource documentIntelligenceDnsZoneGroup 'Microsoft.Network/privateEndpoints/pr
 resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2025-02-01' = {
   name: 'log-document-intelligence-portal-${resourceToken}'
   location: location
+  tags: {
+    'azd-env-name': environmentName
+    purpose: 'logging'
+  }
   properties: {
     sku: {
       name: 'PerGB2018'
     }
     retentionInDays: 30
-  }
-  tags: {
-    'azd-env-name': environmentName
-    purpose: 'logging'
   }
 }
 
@@ -297,13 +294,13 @@ resource applicationInsights 'Microsoft.Insights/components@2020-02-02' = {
   name: 'ai-document-intelligence-portal-${resourceToken}'
   location: location
   kind: 'web'
-  properties: {
-    Application_Type: 'web'
-    WorkspaceResourceId: logAnalyticsWorkspace.id
-  }
   tags: {
     'azd-env-name': environmentName
     purpose: 'monitoring'
+  }
+  properties: {
+    Application_Type: 'web'
+    WorkspaceResourceId: logAnalyticsWorkspace.id
   }
 }
 
@@ -316,6 +313,11 @@ resource webApp 'Microsoft.Web/sites@2024-11-01' = {
     userAssignedIdentities: {
       '${userAssignedIdentity.id}': {}
     }
+  }
+  tags: {
+    'azd-env-name': environmentName
+    'azd-service-name': 'web'
+    purpose: 'web-application'
   }
   properties: {
     serverFarmId: appServicePlan.id
@@ -365,11 +367,6 @@ resource webApp 'Microsoft.Web/sites@2024-11-01' = {
       }
     }
   }
-  tags: {
-    'azd-env-name': environmentName
-    'azd-service-name': 'web'
-    purpose: 'web-application'
-  }
 }
 
 // Role assignments for the managed identity
@@ -378,7 +375,10 @@ resource storageRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-
   scope: storageAccount
   name: guid(storageAccount.id, userAssignedIdentity.id, 'Storage Blob Data Reader')
   properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '2a2b9908-6ea1-4ae2-8e65-a410df84e7d1') // Storage Blob Data Reader
+    roleDefinitionId: subscriptionResourceId(
+      'Microsoft.Authorization/roleDefinitions',
+      '2a2b9908-6ea1-4ae2-8e65-a410df84e7d1'
+    ) // Storage Blob Data Reader
     principalId: userAssignedIdentity.properties.principalId
     principalType: 'ServicePrincipal'
   }
@@ -389,7 +389,10 @@ resource documentIntelligenceRoleAssignment 'Microsoft.Authorization/roleAssignm
   scope: documentIntelligenceAccount
   name: guid(documentIntelligenceAccount.id, userAssignedIdentity.id, 'Cognitive Services User')
   properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'a97b65f3-24c7-4388-baec-2e87135dc908') // Cognitive Services User
+    roleDefinitionId: subscriptionResourceId(
+      'Microsoft.Authorization/roleDefinitions',
+      'a97b65f3-24c7-4388-baec-2e87135dc908'
+    ) // Cognitive Services User
     principalId: userAssignedIdentity.properties.principalId
     principalType: 'ServicePrincipal'
   }
