@@ -20,8 +20,10 @@ public class TestFixture : IDisposable
         var configurationBuilder = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>
             {
+                ["Azure:AuthenticationMode"] = "DevelopmentStorage",
                 ["Azure:DocumentIntelligence:Endpoint"] = "https://test-document-intelligence.cognitiveservices.azure.com/",
                 ["Azure:StorageAccountName"] = "teststorageaccount",
+                ["ConnectionStrings:AzureStorage"] = "UseDevelopmentStorage=true",
                 ["Logging:LogLevel:Default"] = "Debug"
             });
         

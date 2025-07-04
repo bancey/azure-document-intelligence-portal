@@ -1,3 +1,4 @@
+using Azure.Core;
 using Microsoft.Extensions.Configuration;
 
 namespace DocumentIntelligencePortal.Tests.Services;
@@ -10,13 +11,20 @@ public class AzureStorageServiceTests : IClassFixture<TestFixture>
 {
     private readonly TestFixture _fixture;
     private readonly Mock<ILogger<AzureStorageService>> _mockLogger;
+    private readonly Mock<IAzureCredentialProvider> _mockCredentialProvider;
     private readonly IConfiguration _configuration;
 
     public AzureStorageServiceTests(TestFixture fixture)
     {
         _fixture = fixture;
         _mockLogger = _fixture.CreateMockLogger<AzureStorageService>();
+        _mockCredentialProvider = new Mock<IAzureCredentialProvider>();
         _configuration = _fixture.Configuration;
+        
+        // Setup mock credential provider to return a mock credential
+        _mockCredentialProvider
+            .Setup(x => x.GetCredential())
+            .Returns(new Mock<TokenCredential>().Object);
     }
 
     [Fact]
@@ -47,7 +55,7 @@ public class AzureStorageServiceTests : IClassFixture<TestFixture>
 
         // Act & Assert
         var exception = Assert.Throws<InvalidOperationException>(() =>
-            new AzureStorageService(_mockLogger.Object, invalidConfig));
+            new AzureStorageService(_mockLogger.Object, invalidConfig, _mockCredentialProvider.Object));
         
         exception.Message.Should().Contain("Azure:StorageAccountName configuration is missing");
     }
@@ -293,6 +301,6 @@ public class AzureStorageServiceTests : IClassFixture<TestFixture>
 
     private AzureStorageService CreateAzureStorageService()
     {
-        return new AzureStorageService(_mockLogger.Object, _configuration);
+        return new AzureStorageService(_mockLogger.Object, _configuration, _mockCredentialProvider.Object);
     }
 }

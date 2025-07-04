@@ -33,7 +33,8 @@ public class DocumentIntelligenceService : IDocumentIntelligenceService
     public DocumentIntelligenceService(
         ILogger<DocumentIntelligenceService> logger, 
         IConfiguration configuration,
-        IAzureStorageService storageService)
+        IAzureStorageService storageService,
+        IAzureCredentialProvider credentialProvider)
     {
         _logger = logger;
         _configuration = configuration;
@@ -46,8 +47,8 @@ public class DocumentIntelligenceService : IDocumentIntelligenceService
             throw new InvalidOperationException("Azure:DocumentIntelligence:Endpoint configuration is missing");
         }
 
-        // Use managed identity for authentication
-        var credential = new DefaultAzureCredential();
+        // Use credential provider for authentication
+        var credential = credentialProvider.GetCredential();
         _documentAnalysisClient = new DocumentAnalysisClient(new Uri(endpoint), credential);
 
         _logger.LogInformation("Document Intelligence Service initialized with endpoint: {Endpoint}", endpoint);

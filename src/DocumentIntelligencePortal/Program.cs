@@ -46,6 +46,7 @@ try
     });
 
 // Register Azure services with dependency injection
+builder.Services.AddSingleton<IAzureCredentialProvider, AzureCredentialProvider>();
 builder.Services.AddScoped<IAzureStorageService, AzureStorageService>();
 builder.Services.AddScoped<IDocumentIntelligenceService, DocumentIntelligenceService>();
 
