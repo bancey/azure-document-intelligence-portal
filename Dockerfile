@@ -1,6 +1,6 @@
 # See https://docs.docker.com/engine/reference/builder/
 # Use the official .NET 8 SDK image for build
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
 # Copy csproj and restore as distinct layers
@@ -14,7 +14,7 @@ COPY src/DocumentIntelligencePortal/ ./
 RUN dotnet publish DocumentIntelligencePortal.csproj -c Release -o /app/publish --no-restore
 
 # Use the official .NET 8 ASP.NET runtime image for the final image
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
 WORKDIR /app
 COPY --from=build /app/publish .
 
