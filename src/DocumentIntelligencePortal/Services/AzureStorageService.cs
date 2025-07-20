@@ -23,23 +23,33 @@ public class AzureStorageService : IAzureStorageService
     private readonly ILogger<AzureStorageService> _logger;
     private readonly IConfiguration _configuration;
 
-    public AzureStorageService(ILogger<AzureStorageService> logger, IConfiguration configuration)
+    public AzureStorageService(ILogger<AzureStorageService> logger, IConfiguration configuration, IAzureCredentialProvider credentialProvider)
     {
         _logger = logger;
         _configuration = configuration;
 
-        // Use managed identity for authentication
+        // Get storage account configuration
         var storageAccountName = _configuration["Azure:StorageAccountName"];
         if (string.IsNullOrEmpty(storageAccountName))
         {
             throw new InvalidOperationException("Azure:StorageAccountName configuration is missing");
         }
 
-        var storageUri = new Uri($"https://{storageAccountName}.blob.core.windows.net");
-        
-        // Create credentials using Default Azure Credential (supports managed identity)
-        var credential = new DefaultAzureCredential();
-        _blobServiceClient = new BlobServiceClient(storageUri, credential);
+        // Check if using development storage (Azurite)
+        var connectionString = _configuration.GetConnectionString("AzureStorage");
+        if (!string.IsNullOrEmpty(connectionString) && 
+            (connectionString.Contains("UseDevelopmentStorage=true") || connectionString.Contains("127.0.0.1")))
+        {
+            _logger.LogInformation("Using Azure Storage connection string for development/testing");
+            _blobServiceClient = new BlobServiceClient(connectionString);
+        }
+        else
+        {
+            // Use credential provider for authentication
+            var storageUri = new Uri($"https://{storageAccountName}.blob.core.windows.net");
+            var credential = credentialProvider.GetCredential();
+            _blobServiceClient = new BlobServiceClient(storageUri, credential);
+        }
 
         _logger.LogInformation("Azure Storage Service initialized for account: {StorageAccount}", storageAccountName);
     }

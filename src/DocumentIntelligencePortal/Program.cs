@@ -9,7 +9,7 @@ Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
     .Enrich.FromLogContext()
     .WriteTo.Console()
-    .CreateBootstrapLogger();
+    .CreateLogger();
 
 try
 {
@@ -38,47 +38,49 @@ try
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen(c =>
     {
-        c.SwaggerDoc("v1", new() { 
-            Title = "Document Intelligence Portal API", 
+        c.SwaggerDoc("v1", new()
+        {
+            Title = "Document Intelligence Portal API",
             Version = "v1",
             Description = "API for analyzing documents using Azure Document Intelligence and Azure Storage"
         });
     });
 
-// Register Azure services with dependency injection
-builder.Services.AddScoped<IAzureStorageService, AzureStorageService>();
-builder.Services.AddScoped<IDocumentIntelligenceService, DocumentIntelligenceService>();
+    // Register Azure services with dependency injection
+    builder.Services.AddSingleton<IAzureCredentialProvider, AzureCredentialProvider>();
+    builder.Services.AddScoped<IAzureStorageService, AzureStorageService>();
+    builder.Services.AddScoped<IDocumentIntelligenceService, DocumentIntelligenceService>();
 
-// Add CORS for web interface
-builder.Services.AddCors(options =>
-{
-    options.AddDefaultPolicy(builder =>
+    // Add CORS for web interface
+    builder.Services.AddCors(options =>
     {
-        builder.AllowAnyOrigin()
-               .AllowAnyMethod()
-               .AllowAnyHeader();
+        options.AddDefaultPolicy(builder =>
+        {
+            builder.AllowAnyOrigin()
+                   .AllowAnyMethod()
+                   .AllowAnyHeader();
+        });
     });
-});
 
-// Add health checks
-builder.Services.AddHealthChecks();
+    // Add health checks
+    builder.Services.AddHealthChecks();
 
-var app = builder.Build();
+    var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
+    // Configure the HTTP request pipeline.
+    if (app.Environment.IsDevelopment())
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Document Intelligence Portal API v1");
-        c.RoutePrefix = "swagger";
-    });
-}
+        app.UseSwagger();
+        app.UseSwaggerUI(c =>
+        {
+            c.SwaggerEndpoint("/swagger/v1/swagger.json", "Document Intelligence Portal API v1");
+            c.RoutePrefix = "swagger";
+        });
+    }
 
-app.UseHttpsRedirection();
-app.UseStaticFiles();
-app.UseCors();
+    app.UseHttpsRedirection();
+    app.UseStaticFiles();
+    app.UseCors();
 
     app.UseRouting();
 
