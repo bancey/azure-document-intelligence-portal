@@ -74,6 +74,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2024-01-01' = {
     name: 'Standard_LRS'
   }
   kind: 'StorageV2'
+  identity: { type: 'None' }
   tags: {
     'azd-env-name': environmentName
     purpose: 'document-storage'
@@ -111,6 +112,7 @@ resource documentIntelligenceAccount 'Microsoft.CognitiveServices/accounts@2024-
     'azd-env-name': environmentName
     purpose: 'document-intelligence'
   }
+  identity: { type: 'None' }
   properties: {
     customSubDomainName: '${documentIntelligenceAccountName}-${resourceToken}'
     networkAcls: {
