@@ -41,9 +41,9 @@
       },
       "FluentAssertions": {
         "type": "Direct",
-        "requested": "[8.4.0, )",
-        "resolved": "8.4.0",
-        "contentHash": "EL0ckSJMGfJTiDF0EFU48bV/iIsgFKCaHEpp5LxqjNO0RhfF3WxQuNWosX2L/Xwt8VRRLE8TgN4tSzTTiZAfdA=="
+        "requested": "[8.5.0, )",
+        "resolved": "8.5.0",
+        "contentHash": "VN3eH+jnwSBbEDK1/Z7Sg8Mw6O/zHLKK58OueRpG4rIzLxtlJYTUkUieGee5C4Ymhjkiim0ag2H/0Nc8PfNmaA=="
       },
       "Microsoft.AspNetCore.Mvc.Testing": {
         "type": "Direct",
