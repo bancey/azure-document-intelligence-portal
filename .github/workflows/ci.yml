@@ -51,7 +51,7 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       shell: bash
       run: |
-        ./.sonar/scanner/dotnet-sonarscanner begin /k:"bancey_azure-document-intelligence-portal" /o:"bancey" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.coverage.exclusions="**/bin/**,**/obj/**,**/*.csproj,**/*.sln,**/*.md,**/*.yml,**/*.yaml,**/*.json,**/*.xml,**/Dockerfile,**/docker-compose.yml,**/docker-compose.override.yml"
+        ./.sonar/scanner/dotnet-sonarscanner begin /k:"bancey_azure-document-intelligence-portal" /o:"bancey" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.coverage.exclusions="**/bin/**,**/obj/**,**/*.csproj,**/*.sln,**/*.md,**/*.yml,**/*.yaml,**/*.json,**/*.xml,**/Dockerfile,**/docker-compose.yml,**/docker-compose.override.yml" /d:sonar.cs.opencover.reportsPaths="tests/**/TestResults/**/coverage.opencover.xml" /d:sonar.cs.vstest.reportsPaths="tests/**/TestResults/test-results.trx"
     - name: Build project
       run: dotnet build --no-restore
     - name: Run tests
@@ -64,7 +64,7 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       shell: bash
       run: |
-        ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.cs.opencover.reportsPaths=tests/**/TestResults/**/coverage.opencover.xml /d:sonar.cs.vstest.reportsPaths=tests/**/TestResults/test-results.trx"
+        ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
     - name: Test Report
       uses: dorny/test-reporter@v2
       if: ${{ !cancelled() }}
