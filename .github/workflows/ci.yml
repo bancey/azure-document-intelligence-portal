@@ -57,14 +57,21 @@ jobs:
     - name: Run tests
       id: test
       continue-on-error: true
-      run: dotnet test --no-build --verbosity normal --collect:"XPlat Code Coverage"
+      run: dotnet test --no-build --verbosity normal --collect:"XPlat Code Coverage" --logger "trx;LogFileName=test-results.trx"
     - name: End SonarQube analysis
-      if: always()
+      if: ${{ !cancelled() }}
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       shell: bash
       run: |
         ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+    - name: Test Report
+      uses: dorny/test-reporter@v2
+      if: ${{ !cancelled() }}
+      with:
+        name: xUnit tests
+        path: tests/**/TestResults/test-results.trx
+        reporter: dotnet-trx 
     - name: Check test results
       if: steps.test.outcome == 'failure'
       run: exit 1
