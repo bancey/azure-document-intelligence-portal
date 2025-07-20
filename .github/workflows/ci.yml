@@ -57,14 +57,14 @@ jobs:
     - name: Run tests
       id: test
       continue-on-error: true
-      run: dotnet test --no-build --verbosity normal --collect:"Code Coverage" --logger "trx;LogFileName=test-results.trx"
+      run: dotnet test --no-build --verbosity normal --collect:"XPlat Code Coverage;Format=opencover" --logger "trx;LogFileName=test-results.trx"
     - name: End SonarQube analysis
       if: ${{ !cancelled() }}
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       shell: bash
       run: |
-        ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+        ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.cs.opencover.reportsPaths=tests/**/TestResults/**/coverage.opencover.xml /d:sonar.cs.vstest.reportsPaths=tests/**/TestResults/test-results.trx"
     - name: Test Report
       uses: dorny/test-reporter@v2
       if: ${{ !cancelled() }}
