@@ -22,7 +22,7 @@ public class DocumentIntelligenceServiceTests : IClassFixture<TestFixture>
         _mockStorageService = new Mock<IAzureStorageService>();
         _mockCredentialProvider = new Mock<IAzureCredentialProvider>();
         _configuration = _fixture.Configuration;
-        
+
         // Setup mock credential provider to return a mock credential
         _mockCredentialProvider
             .Setup(x => x.GetCredential())
@@ -58,7 +58,7 @@ public class DocumentIntelligenceServiceTests : IClassFixture<TestFixture>
         // Act & Assert
         var exception = Assert.Throws<InvalidOperationException>(() =>
             new DocumentIntelligenceService(_mockLogger.Object, invalidConfig, _mockStorageService.Object, _mockCredentialProvider.Object));
-        
+
         exception.Message.Should().Contain("Azure:DocumentIntelligence:Endpoint configuration is missing");
     }
 
@@ -216,7 +216,7 @@ public class DocumentIntelligenceServiceTests : IClassFixture<TestFixture>
         var service = CreateDocumentIntelligenceService();
         var request = TestDataFactory.CreateAnalyzeDocumentFromStorageRequest();
         var mockStream = TestDataFactory.CreateTestDocumentStream();
-        
+
         _mockStorageService
             .Setup(x => x.GetDocumentStreamAsync(request.ContainerName, request.BlobName))
             .ReturnsAsync(mockStream);
@@ -243,7 +243,7 @@ public class DocumentIntelligenceServiceTests : IClassFixture<TestFixture>
         // Arrange
         var service = CreateDocumentIntelligenceService();
         var request = TestDataFactory.CreateAnalyzeDocumentFromStorageRequest();
-        
+
         _mockStorageService
             .Setup(x => x.GetDocumentStreamAsync(request.ContainerName, request.BlobName))
             .ReturnsAsync((Stream?)null);

@@ -65,7 +65,7 @@ public class EndToEndTests
                     {
                         services.Remove(storageServiceDescriptor);
                     }
-                    
+
                     var docIntelligenceServiceDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(IDocumentIntelligenceService));
                     if (docIntelligenceServiceDescriptor != null)
                     {
@@ -74,7 +74,7 @@ public class EndToEndTests
 
                     var mockStorageService = new Mock<IAzureStorageService>();
                     var mockDocIntelligenceService = new Mock<IDocumentIntelligenceService>();
-                    
+
                     mockDocIntelligenceService
                         .Setup(x => x.AnalyzeDocumentAsync(It.IsAny<AnalyzeDocumentRequest>()))
                         .ReturnsAsync(new AnalyzeDocumentResponse
@@ -105,11 +105,11 @@ public class EndToEndTests
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        
+
         var responseContent = await response.Content.ReadAsStringAsync();
-        var result = JsonSerializer.Deserialize<AnalyzeDocumentResponse>(responseContent, 
+        var result = JsonSerializer.Deserialize<AnalyzeDocumentResponse>(responseContent,
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-        
+
         result.Should().NotBeNull();
         result!.Success.Should().BeTrue();
         result.Result.Should().NotBeNull();

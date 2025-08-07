@@ -47,7 +47,7 @@ public class ApplicationIntegrationTests
                     {
                         services.Remove(storageServiceDescriptor);
                     }
-                    
+
                     var docIntelligenceServiceDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(IDocumentIntelligenceService));
                     if (docIntelligenceServiceDescriptor != null)
                     {
@@ -57,7 +57,7 @@ public class ApplicationIntegrationTests
                     // Add mock services
                     var mockStorageService = new Mock<IAzureStorageService>();
                     var mockDocIntelligenceService = new Mock<IDocumentIntelligenceService>();
-                    
+
                     services.AddSingleton(mockStorageService.Object);
                     services.AddSingleton(mockDocIntelligenceService.Object);
                 });
@@ -86,7 +86,7 @@ public class ApplicationIntegrationTests
                     {
                         services.Remove(storageServiceDescriptor);
                     }
-                    
+
                     var docIntelligenceServiceDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(IDocumentIntelligenceService));
                     if (docIntelligenceServiceDescriptor != null)
                     {
@@ -96,7 +96,7 @@ public class ApplicationIntegrationTests
                     // Add mock services
                     var mockStorageService = new Mock<IAzureStorageService>();
                     var mockDocIntelligenceService = new Mock<IDocumentIntelligenceService>();
-                    
+
                     mockDocIntelligenceService
                         .Setup(x => x.AnalyzeDocumentAsync(It.IsAny<AnalyzeDocumentRequest>()))
                         .ReturnsAsync(new AnalyzeDocumentResponse
@@ -128,11 +128,11 @@ public class ApplicationIntegrationTests
         // Assert
         response.Should().NotBeNull();
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        
+
         var responseContent = await response.Content.ReadAsStringAsync();
         responseContent.Should().NotBeNullOrEmpty();
-        
-        var result = JsonSerializer.Deserialize<AnalyzeDocumentResponse>(responseContent, 
+
+        var result = JsonSerializer.Deserialize<AnalyzeDocumentResponse>(responseContent,
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
         result.Should().NotBeNull();
         result!.Success.Should().BeTrue();
@@ -175,11 +175,11 @@ public class ApplicationIntegrationTests
         // Assert
         response.Should().NotBeNull();
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        
+
         var responseContent = await response.Content.ReadAsStringAsync();
         var result = JsonSerializer.Deserialize<ListContainersResponse>(responseContent,
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-        
+
         result.Should().NotBeNull();
         result!.Success.Should().BeTrue();
         result.Containers.Should().NotBeNull();
@@ -194,9 +194,9 @@ public class ApplicationIntegrationTests
         // Arrange
         using var factory = new WebApplicationFactory<Program>();
         using var client = factory.CreateClient();
-        
+
         var request = new HttpRequestMessage(new HttpMethod(method), endpoint);
-        
+
         if (method == "POST")
         {
             // Add minimal body for POST requests to avoid bad request due to missing body
@@ -248,7 +248,7 @@ public class ApplicationIntegrationTests
         // Assert
         // Check if CORS headers are present (this depends on your CORS configuration)
         var hasAccessControlAllowOrigin = response.Headers.Contains("Access-Control-Allow-Origin");
-        
+
         // This assertion might need to be adjusted based on your CORS policy
         // For now, we just verify the request completes without CORS errors
         response.Should().NotBeNull();

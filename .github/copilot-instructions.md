@@ -9,7 +9,7 @@ Always reference these instructions first and fallback to search or bash command
 ### Bootstrap, Build, and Test
 - `dotnet restore --locked-mode` - Restore NuGet packages using lock file (~400ms)
 - `dotnet build --no-restore` - Build the solution (~11 seconds) 
-- `dotnet test --verbosity minimal` - Run all tests (~6m 45s). NEVER CANCEL - includes integration tests with Azure service timeouts. Set timeout to 8+ minutes.
+- `dotnet test --verbosity minimal` - Run all tests (~48 seconds). Fast-failing retry policies significantly improved performance from previous ~6m 45s.
 - `dotnet format --verify-no-changes` - Verify code formatting is correct
 - `dotnet format` - Fix code formatting issues
 
@@ -22,7 +22,7 @@ Always reference these instructions first and fallback to search or bash command
 - Main UI: `http://localhost:5162/` - Web interface for document analysis
 
 ### Testing Options
-- **All tests**: `dotnet test` (6+ minutes - includes integration tests)
+- **All tests**: `dotnet test` (~48 seconds - includes integration tests with fast-failing retry policies)
 - **Fast unit tests**: `dotnet test --filter "FullyQualifiedName!~Integration"` (~30 seconds)
 - **With coverage**: `dotnet test --collect:"XPlat Code Coverage"`
 - **Test runner script**: `tests/DocumentIntelligencePortal.Tests/run-tests.sh --help`
@@ -132,7 +132,7 @@ docker build -t document-intelligence-portal .
 
 ### Testing
 ```bash
-# Run all tests (NEVER CANCEL - takes ~6m 45s)
+# Run all tests (~48 seconds with fast-failing retry policies)
 dotnet test --verbosity minimal
 
 # Run only unit tests (fast)
@@ -188,7 +188,7 @@ dotnet publish -c Release -o ./publish
 
 ### Common Issues
 1. **Build Failures**: Ensure .NET 8 SDK is installed (`dotnet --version` should show 8.x.x)
-2. **Test Timeouts**: Integration tests can take 20-30 seconds each due to Azure service timeouts - this is normal
+2. **Test Performance**: Integration tests now use fast-failing retry policies (2 retries, 100ms-1000ms delays) for much faster execution
 3. **Format Errors**: Run `dotnet format` to fix whitespace and style issues
 4. **Authentication Errors**: Check `appsettings.Development.json` for correct `AuthenticationMode` setting
 
@@ -221,11 +221,11 @@ The repository includes CI pipeline (`.github/workflows/ci.yml`) that:
 - **Restore**: ~400ms (with cache)
 - **Build**: ~11 seconds
 - **Unit tests**: ~30 seconds
-- **All tests**: ~6m 45s (NEVER CANCEL - includes integration tests with timeouts)
+- **All tests**: ~48 seconds (includes integration tests with fast-failing retry policies)
 - **Code formatting**: ~5 seconds
 
 ### Known Timing Considerations
-- Integration tests connect to Azure services with 20-30 second timeouts each
+- Integration tests use fast-failing retry policies with Azure services (2 retries max, 100ms-1000ms delays)
 - SonarCloud analysis adds ~2-3 minutes to CI builds
 - Docker builds take ~3-5 minutes depending on cache
 
