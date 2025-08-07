@@ -46,7 +46,7 @@ public class StorageControllerIntegrationTests : IClassFixture<TestFixture>
                     services.AddSingleton(mockStorageService.Object);
                 });
             });
-        
+
         var client = factory.CreateClient();
 
         // Act
@@ -79,7 +79,7 @@ public class StorageControllerIntegrationTests : IClassFixture<TestFixture>
                     var mockStorageService = new Mock<IAzureStorageService>();
                     var testContent = System.Text.Encoding.UTF8.GetBytes("Test PDF content");
                     var testStream = new MemoryStream(testContent);
-                    
+
                     mockStorageService
                         .Setup(x => x.GetDocumentStreamAsync(It.IsAny<string>(), It.IsAny<string>()))
                         .ReturnsAsync(testStream);
@@ -87,7 +87,7 @@ public class StorageControllerIntegrationTests : IClassFixture<TestFixture>
                     services.AddSingleton(mockStorageService.Object);
                 });
             });
-        
+
         var client = factory.CreateClient();
         var containerName = "test-documents";
         var blobName = "sample.pdf";

@@ -31,21 +31,21 @@ public class StorageController : ControllerBase
         {
             _logger.LogInformation("Getting storage containers");
             var result = await _storageService.ListContainersAsync();
-            
+
             if (result.Success)
             {
                 return Ok(result);
             }
-            
+
             return BadRequest(result);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error getting storage containers");
-            return StatusCode(500, new ListContainersResponse 
-            { 
-                Success = false, 
-                ErrorMessage = "Internal server error" 
+            return StatusCode(500, new ListContainersResponse
+            {
+                Success = false,
+                ErrorMessage = "Internal server error"
             });
         }
     }
@@ -61,32 +61,32 @@ public class StorageController : ControllerBase
         try
         {
             _logger.LogInformation("Getting documents from container: {Container}", containerName);
-            
+
             if (string.IsNullOrWhiteSpace(containerName))
             {
-                return BadRequest(new ListDocumentsResponse 
-                { 
-                    Success = false, 
-                    ErrorMessage = "Container name is required" 
+                return BadRequest(new ListDocumentsResponse
+                {
+                    Success = false,
+                    ErrorMessage = "Container name is required"
                 });
             }
 
             var result = await _storageService.ListDocumentsAsync(containerName);
-            
+
             if (result.Success)
             {
                 return Ok(result);
             }
-            
+
             return BadRequest(result);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error getting documents from container: {Container}", containerName);
-            return StatusCode(500, new ListDocumentsResponse 
-            { 
-                Success = false, 
-                ErrorMessage = "Internal server error" 
+            return StatusCode(500, new ListDocumentsResponse
+            {
+                Success = false,
+                ErrorMessage = "Internal server error"
             });
         }
     }
@@ -103,14 +103,14 @@ public class StorageController : ControllerBase
         try
         {
             _logger.LogInformation("Downloading document: {Container}/{Blob}", containerName, blobName);
-            
+
             if (string.IsNullOrWhiteSpace(containerName) || string.IsNullOrWhiteSpace(blobName))
             {
                 return BadRequest("Container name and blob name are required");
             }
 
             var stream = await _storageService.GetDocumentStreamAsync(containerName, blobName);
-            
+
             if (stream == null)
             {
                 return NotFound($"Document not found: {containerName}/{blobName}");
@@ -118,7 +118,7 @@ public class StorageController : ControllerBase
 
             // Determine content type based on file extension
             var contentType = GetContentType(blobName);
-            
+
             return File(stream, contentType, blobName);
         }
         catch (Exception ex)
@@ -137,20 +137,20 @@ public class StorageController : ControllerBase
     /// <returns>Search results with matching documents</returns>
     [HttpGet("containers/{containerName}/documents/search")]
     public async Task<ActionResult<SearchDocumentsResponse>> SearchDocuments(
-        string containerName, 
+        string containerName,
         [FromQuery] string searchTerm,
         [FromQuery] int maxResults = 100)
     {
         try
         {
-            _logger.LogInformation("Searching documents in container: {Container} with term: {SearchTerm}", 
+            _logger.LogInformation("Searching documents in container: {Container} with term: {SearchTerm}",
                 containerName, searchTerm);
-            
+
             if (string.IsNullOrWhiteSpace(containerName))
             {
-                return BadRequest(new SearchDocumentsResponse 
-                { 
-                    Success = false, 
+                return BadRequest(new SearchDocumentsResponse
+                {
+                    Success = false,
                     ErrorMessage = "Container name is required",
                     SearchTerm = searchTerm ?? string.Empty,
                     MaxResults = maxResults
@@ -159,9 +159,9 @@ public class StorageController : ControllerBase
 
             if (string.IsNullOrWhiteSpace(searchTerm))
             {
-                return BadRequest(new SearchDocumentsResponse 
-                { 
-                    Success = false, 
+                return BadRequest(new SearchDocumentsResponse
+                {
+                    Success = false,
                     ErrorMessage = "Search term is required",
                     SearchTerm = searchTerm ?? string.Empty,
                     MaxResults = maxResults
@@ -171,9 +171,9 @@ public class StorageController : ControllerBase
             // Validate maxResults parameter
             if (maxResults < 1 || maxResults > 1000)
             {
-                return BadRequest(new SearchDocumentsResponse 
-                { 
-                    Success = false, 
+                return BadRequest(new SearchDocumentsResponse
+                {
+                    Success = false,
                     ErrorMessage = "Max results must be between 1 and 1000",
                     SearchTerm = searchTerm,
                     MaxResults = maxResults
@@ -181,21 +181,21 @@ public class StorageController : ControllerBase
             }
 
             var result = await _storageService.SearchDocumentsAsync(containerName, searchTerm, maxResults);
-            
+
             if (result.Success)
             {
                 return Ok(result);
             }
-            
+
             return BadRequest(result);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error searching documents in container: {Container} with term: {SearchTerm}", 
+            _logger.LogError(ex, "Error searching documents in container: {Container} with term: {SearchTerm}",
                 containerName, searchTerm);
-            return StatusCode(500, new SearchDocumentsResponse 
-            { 
-                Success = false, 
+            return StatusCode(500, new SearchDocumentsResponse
+            {
+                Success = false,
                 ErrorMessage = "Internal server error",
                 SearchTerm = searchTerm ?? string.Empty,
                 MaxResults = maxResults

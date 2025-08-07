@@ -116,7 +116,7 @@ public class PerformanceTests
         // Assert
         response.IsSuccessStatusCode.Should().BeTrue();
         stopwatch.ElapsedMilliseconds.Should().BeLessThan(1000, "Storage operations should complete within 1 second");
-        
+
         var result = await response.Content.ReadFromJsonAsync<ListContainersResponse>();
         result.Should().NotBeNull();
         result!.Containers.Should().HaveCount(100);

@@ -120,7 +120,7 @@ public class DocumentAnalysisControllerTests : IClassFixture<TestFixture>
         response.Success.Should().BeTrue();
 
         _mockDocumentService.Verify(
-            x => x.AnalyzeDocumentAsync(It.Is<AnalyzeDocumentRequest>(r => 
+            x => x.AnalyzeDocumentAsync(It.Is<AnalyzeDocumentRequest>(r =>
                 r.BlobUri == request.BlobUri && r.ModelId == request.ModelId)),
             Times.Once);
     }
@@ -225,13 +225,13 @@ public class DocumentAnalysisControllerTests : IClassFixture<TestFixture>
         // Assert
         result.Should().NotBeNull();
         var okResult = result.Result.Should().BeOfType<OkObjectResult>().Subject;
-        
+
         _mockStorageService.Verify(
             x => x.GetDocumentSasUriAsync(containerName, blobName),
             Times.Once);
-        
+
         _mockDocumentService.Verify(
-            x => x.AnalyzeDocumentAsync(It.Is<AnalyzeDocumentRequest>(r => 
+            x => x.AnalyzeDocumentAsync(It.Is<AnalyzeDocumentRequest>(r =>
                 r.BlobUri == sasUri && r.ModelId == modelId)),
             Times.Once);
     }
@@ -263,7 +263,7 @@ public class DocumentAnalysisControllerTests : IClassFixture<TestFixture>
 
         // Assert
         _mockDocumentService.Verify(
-            x => x.AnalyzeDocumentAsync(It.Is<AnalyzeDocumentRequest>(r => 
+            x => x.AnalyzeDocumentAsync(It.Is<AnalyzeDocumentRequest>(r =>
                 r.ModelId == "prebuilt-document")),
             Times.Once);
     }

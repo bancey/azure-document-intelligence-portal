@@ -55,7 +55,7 @@ public class AzureStorageServiceIntegrationTests : ContainerTestBase
     {
         var configuration = ServiceProvider.GetRequiredService<IConfiguration>();
         var logger = new Mock<ILogger<AzureStorageService>>();
-        
+
         // We need to create a custom AzureStorageService that accepts connection string
         return new TestAzureStorageService(logger.Object, configuration, ConnectionString);
     }
@@ -80,7 +80,7 @@ internal class TestAzureStorageService : IAzureStorageService
         try
         {
             _logger.LogInformation("Listing storage containers");
-            
+
             var containers = new List<string>();
             await foreach (var container in _blobServiceClient.GetBlobContainersAsync())
             {
@@ -88,7 +88,7 @@ internal class TestAzureStorageService : IAzureStorageService
             }
 
             _logger.LogInformation("Found {ContainerCount} containers", containers.Count);
-            
+
             return new ListContainersResponse
             {
                 Success = true,
@@ -111,7 +111,7 @@ internal class TestAzureStorageService : IAzureStorageService
         try
         {
             _logger.LogInformation("Listing documents in container: {Container}", containerName);
-            
+
             var containerClient = _blobServiceClient.GetBlobContainerClient(containerName);
             var documents = new List<StorageDocument>();
 
@@ -129,9 +129,9 @@ internal class TestAzureStorageService : IAzureStorageService
                 documents.Add(document);
             }
 
-            _logger.LogInformation("Found {DocumentCount} documents in container {Container}", 
+            _logger.LogInformation("Found {DocumentCount} documents in container {Container}",
                 documents.Count, containerName);
-            
+
             return new ListDocumentsResponse
             {
                 Success = true,
@@ -185,9 +185,9 @@ internal class TestAzureStorageService : IAzureStorageService
         try
         {
             _logger.LogInformation("Getting document stream for: {Container}/{Blob}", containerName, blobName);
-            
+
             var blobClient = _blobServiceClient.GetBlobContainerClient(containerName).GetBlobClient(blobName);
-            
+
             if (await blobClient.ExistsAsync())
             {
                 var memoryStream = new MemoryStream();
@@ -210,7 +210,7 @@ internal class TestAzureStorageService : IAzureStorageService
         try
         {
             var blobClient = _blobServiceClient.GetBlobContainerClient(containerName).GetBlobClient(blobName);
-            
+
             if (!await blobClient.ExistsAsync())
             {
                 throw new FileNotFoundException($"Document not found: {containerName}/{blobName}");

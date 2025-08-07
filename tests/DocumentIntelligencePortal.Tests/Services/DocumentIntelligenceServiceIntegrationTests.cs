@@ -62,7 +62,7 @@ public class DocumentIntelligenceServiceIntegrationTests : IClassFixture<TestFix
         var mockStorageService = new Mock<IAzureStorageService>();
         var service = CreateMockedDocumentIntelligenceService(mockStorageService.Object);
         var request = TestDataFactory.CreateAnalyzeDocumentStreamRequest();
-        
+
         using var stream = TestDataFactory.CreateTestDocumentStream();
 
         // Act
@@ -81,7 +81,7 @@ public class DocumentIntelligenceServiceIntegrationTests : IClassFixture<TestFix
         // Arrange
         var mockStorageService = new Mock<IAzureStorageService>();
         var testStream = TestDataFactory.CreateTestDocumentStream("Mock PDF content for testing");
-        
+
         mockStorageService
             .Setup(x => x.GetDocumentStreamAsync(It.IsAny<string>(), It.IsAny<string>()))
             .ReturnsAsync(testStream);
@@ -97,7 +97,7 @@ public class DocumentIntelligenceServiceIntegrationTests : IClassFixture<TestFix
         result.Success.Should().BeTrue();
         result.Result.Should().NotBeNull();
         result.Result!.ModelId.Should().Be(request.ModelId);
-        
+
         mockStorageService.Verify(x => x.GetDocumentStreamAsync(request.ContainerName, request.BlobName), Times.Once);
     }
 
@@ -106,7 +106,7 @@ public class DocumentIntelligenceServiceIntegrationTests : IClassFixture<TestFix
     {
         // Arrange
         var mockStorageService = new Mock<IAzureStorageService>();
-        
+
         mockStorageService
             .Setup(x => x.GetDocumentStreamAsync(It.IsAny<string>(), It.IsAny<string>()))
             .ReturnsAsync((Stream?)null);
@@ -133,7 +133,7 @@ public class DocumentIntelligenceServiceIntegrationTests : IClassFixture<TestFix
             .Build();
 
         var logger = new Mock<ILogger<DocumentIntelligenceService>>();
-        
+
         // Return a mock service that doesn't require real Azure credentials
         return new MockDocumentIntelligenceService(logger.Object, configuration, storageService);
     }
@@ -162,7 +162,7 @@ internal class MockDocumentIntelligenceService : IDocumentIntelligenceService
     public Task<AnalyzeDocumentResponse> AnalyzeDocumentAsync(AnalyzeDocumentRequest request)
     {
         _logger.LogInformation("Mock analysis for document: {BlobUri}", request.BlobUri);
-        
+
         if (string.IsNullOrWhiteSpace(request.BlobUri))
         {
             return Task.FromResult(new AnalyzeDocumentResponse
@@ -173,7 +173,7 @@ internal class MockDocumentIntelligenceService : IDocumentIntelligenceService
         }
 
         var result = CreateMockAnalysisResult(request.BlobUri, request.ModelId);
-        
+
         return Task.FromResult(new AnalyzeDocumentResponse
         {
             Success = true,
@@ -186,7 +186,7 @@ internal class MockDocumentIntelligenceService : IDocumentIntelligenceService
     public Task<AnalyzeDocumentResponse> AnalyzeDocumentFromStreamAsync(Stream documentStream, AnalyzeDocumentStreamRequest request)
     {
         _logger.LogInformation("Mock analysis from stream for file: {FileName}", request.FileName);
-        
+
         if (documentStream == null || documentStream.Length == 0)
         {
             return Task.FromResult(new AnalyzeDocumentResponse
@@ -197,7 +197,7 @@ internal class MockDocumentIntelligenceService : IDocumentIntelligenceService
         }
 
         var result = CreateMockAnalysisResult(request.FileName, request.ModelId);
-        
+
         return Task.FromResult(new AnalyzeDocumentResponse
         {
             Success = true,
@@ -209,9 +209,9 @@ internal class MockDocumentIntelligenceService : IDocumentIntelligenceService
 
     public async Task<AnalyzeDocumentResponse> AnalyzeDocumentFromStorageAsync(AnalyzeDocumentFromStorageRequest request)
     {
-        _logger.LogInformation("Mock analysis from storage: {ContainerName}/{BlobName}", 
+        _logger.LogInformation("Mock analysis from storage: {ContainerName}/{BlobName}",
             request.ContainerName, request.BlobName);
-        
+
         if (string.IsNullOrWhiteSpace(request.ContainerName) || string.IsNullOrWhiteSpace(request.BlobName))
         {
             return new AnalyzeDocumentResponse
@@ -223,7 +223,7 @@ internal class MockDocumentIntelligenceService : IDocumentIntelligenceService
 
         // Use the storage service to check if document exists
         using var documentStream = await _storageService.GetDocumentStreamAsync(request.ContainerName, request.BlobName);
-        
+
         if (documentStream == null)
         {
             return new AnalyzeDocumentResponse
@@ -234,7 +234,7 @@ internal class MockDocumentIntelligenceService : IDocumentIntelligenceService
         }
 
         var result = CreateMockAnalysisResult($"{request.ContainerName}/{request.BlobName}", request.ModelId);
-        
+
         return new AnalyzeDocumentResponse
         {
             Success = true,
@@ -292,17 +292,17 @@ internal class MockDocumentIntelligenceService : IDocumentIntelligenceService
                         new()
                         {
                             Content = "Mock line 1 content",
-                            BoundingBox = new BoundingBox 
-                            { 
-                                Points = new List<float> { 100, 100, 300, 100, 300, 120, 100, 120 } 
+                            BoundingBox = new BoundingBox
+                            {
+                                Points = new List<float> { 100, 100, 300, 100, 300, 120, 100, 120 }
                             }
                         },
                         new()
                         {
                             Content = "Mock line 2 content",
-                            BoundingBox = new BoundingBox 
-                            { 
-                                Points = new List<float> { 100, 130, 280, 130, 280, 150, 100, 150 } 
+                            BoundingBox = new BoundingBox
+                            {
+                                Points = new List<float> { 100, 130, 280, 130, 280, 150, 100, 150 }
                             }
                         }
                     }
@@ -323,9 +323,9 @@ internal class MockDocumentIntelligenceService : IDocumentIntelligenceService
                             ColumnIndex = 0,
                             RowSpan = 1,
                             ColumnSpan = 1,
-                            BoundingBox = new BoundingBox 
-                            { 
-                                Points = new List<float> { 100, 200, 200, 200, 200, 220, 100, 220 } 
+                            BoundingBox = new BoundingBox
+                            {
+                                Points = new List<float> { 100, 200, 200, 200, 200, 220, 100, 220 }
                             }
                         },
                         new()
@@ -335,9 +335,9 @@ internal class MockDocumentIntelligenceService : IDocumentIntelligenceService
                             ColumnIndex = 1,
                             RowSpan = 1,
                             ColumnSpan = 1,
-                            BoundingBox = new BoundingBox 
-                            { 
-                                Points = new List<float> { 200, 200, 300, 200, 300, 220, 200, 220 } 
+                            BoundingBox = new BoundingBox
+                            {
+                                Points = new List<float> { 200, 200, 300, 200, 300, 220, 200, 220 }
                             }
                         }
                     }

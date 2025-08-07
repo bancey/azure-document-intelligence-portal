@@ -19,6 +19,7 @@ public class AzureStorageServiceTests : MockedTestBase
         _mockLogger = CreateMockLogger<AzureStorageService>();
         _mockCredentialProvider = new Mock<IAzureCredentialProvider>();
         
+        
         // Setup mock credential provider to return a mock credential
         _mockCredentialProvider
             .Setup(x => x.GetCredential())
@@ -54,7 +55,7 @@ public class AzureStorageServiceTests : MockedTestBase
         // Act & Assert
         var exception = Assert.Throws<InvalidOperationException>(() =>
             new AzureStorageService(_mockLogger.Object, invalidConfig, _mockCredentialProvider.Object));
-        
+
         exception.Message.Should().Contain("Azure:StorageAccountName configuration is missing");
     }
 
@@ -66,7 +67,12 @@ public class AzureStorageServiceTests : MockedTestBase
 
         // Act - This should fail fast with our mock configuration (no retries)
         var result = await service.ListContainersAsync();
-
+        
+        // Assert - Should fail fast but still log the attempt
+        result.Should().NotBeNull();
+        result.Success.Should().BeFalse();
+        
+        
         // Assert - Should fail fast but still log the attempt
         result.Should().NotBeNull();
         result.Success.Should().BeFalse();
@@ -94,7 +100,7 @@ public class AzureStorageServiceTests : MockedTestBase
         try
         {
             var result = await service.ListDocumentsAsync(containerName!);
-            
+
             // If this doesn't throw, verify it handles invalid input appropriately
             result.Should().NotBeNull();
         }
@@ -114,7 +120,12 @@ public class AzureStorageServiceTests : MockedTestBase
 
         // Act - Should fail fast with mock configuration
         var result = await service.ListDocumentsAsync(containerName);
-
+        
+        // Assert - Should fail fast but still log the attempt
+        result.Should().NotBeNull();
+        result.Success.Should().BeFalse();
+        
+        
         // Assert - Should fail fast but still log the attempt
         result.Should().NotBeNull();
         result.Success.Should().BeFalse();
@@ -144,7 +155,7 @@ public class AzureStorageServiceTests : MockedTestBase
         try
         {
             var result = await service.GetDocumentStreamAsync(containerName!, blobName!);
-            
+
             // If this doesn't throw, the result should be null for invalid parameters
             result.Should().BeNull();
         }
@@ -168,6 +179,7 @@ public class AzureStorageServiceTests : MockedTestBase
 
         // Assert - Should fail fast and return null
         result.Should().BeNull();
+        
         
         _mockLogger.Verify(
             x => x.Log(
@@ -194,7 +206,7 @@ public class AzureStorageServiceTests : MockedTestBase
         try
         {
             var result = await service.SearchDocumentsAsync(containerName!, searchTerm!);
-            
+
             // Should handle invalid parameters gracefully
             result.Should().NotBeNull();
             result.Success.Should().BeFalse();
@@ -222,6 +234,7 @@ public class AzureStorageServiceTests : MockedTestBase
         // Since we're using a mock configuration with no retries, this will fail fast
         var result = await service.SearchDocumentsAsync(containerName, searchTerm);
         
+        
         // Should fail fast without long retries but pattern is accepted
         result.Should().NotBeNull();
         result.Success.Should().BeFalse(); // Expected to fail with mocked connection
@@ -243,6 +256,7 @@ public class AzureStorageServiceTests : MockedTestBase
         // Act & Assert
         // Validate service accepts different max results values
         var result = await service.SearchDocumentsAsync(containerName, searchTerm, maxResults);
+        
         
         // Should fail fast without long retries but maxResults is accepted
         result.Should().NotBeNull();

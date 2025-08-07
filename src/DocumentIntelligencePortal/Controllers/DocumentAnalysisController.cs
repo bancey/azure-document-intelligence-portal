@@ -37,32 +37,32 @@ public class DocumentAnalysisController : ControllerBase
         {
             if (request == null || string.IsNullOrWhiteSpace(request.BlobUri))
             {
-                return BadRequest(new AnalyzeDocumentResponse 
-                { 
-                    Success = false, 
-                    Message = "Blob URI is required" 
+                return BadRequest(new AnalyzeDocumentResponse
+                {
+                    Success = false,
+                    Message = "Blob URI is required"
                 });
             }
 
-            _logger.LogInformation("Analyzing document: {BlobUri} with model: {ModelId}", 
+            _logger.LogInformation("Analyzing document: {BlobUri} with model: {ModelId}",
                 request.BlobUri, request.ModelId);
 
             var result = await _documentIntelligenceService.AnalyzeDocumentAsync(request);
-            
+
             if (result.Success)
             {
                 return Ok(result);
             }
-            
+
             return BadRequest(result);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error analyzing document: {BlobUri}", request is null ? "null" : request.BlobUri);
-            return StatusCode(500, new AnalyzeDocumentResponse 
-            { 
-                Success = false, 
-                Message = "Internal server error" 
+            return StatusCode(500, new AnalyzeDocumentResponse
+            {
+                Success = false,
+                Message = "Internal server error"
             });
         }
     }
@@ -76,27 +76,27 @@ public class DocumentAnalysisController : ControllerBase
     /// <returns>Analysis result</returns>
     [HttpPost("analyze/{containerName}/{blobName}")]
     public async Task<ActionResult<AnalyzeDocumentResponse>> AnalyzeDocumentByPath(
-        string containerName, 
-        string blobName, 
+        string containerName,
+        string blobName,
         [FromQuery] string modelId = "prebuilt-document")
     {
         try
         {
-            _logger.LogInformation("Analyzing document: {Container}/{Blob} with model: {ModelId}", 
+            _logger.LogInformation("Analyzing document: {Container}/{Blob} with model: {ModelId}",
                 containerName, blobName, modelId);
 
             if (string.IsNullOrWhiteSpace(containerName) || string.IsNullOrWhiteSpace(blobName))
             {
-                return BadRequest(new AnalyzeDocumentResponse 
-                { 
-                    Success = false, 
-                    Message = "Container name and blob name are required" 
+                return BadRequest(new AnalyzeDocumentResponse
+                {
+                    Success = false,
+                    Message = "Container name and blob name are required"
                 });
             }
 
             // Get the blob URI from the storage service
             var blobUri = await _storageService.GetDocumentSasUriAsync(containerName, blobName);
-            
+
             var request = new AnalyzeDocumentRequest
             {
                 BlobUri = blobUri,
@@ -105,30 +105,30 @@ public class DocumentAnalysisController : ControllerBase
             };
 
             var result = await _documentIntelligenceService.AnalyzeDocumentAsync(request);
-            
+
             if (result.Success)
             {
                 return Ok(result);
             }
-            
+
             return BadRequest(result);
         }
         catch (FileNotFoundException ex)
         {
             _logger.LogError(ex, "Document not found: {Container}/{Blob}", containerName, blobName);
-            return NotFound(new AnalyzeDocumentResponse 
-            { 
-                Success = false, 
-                Message = $"Document not found: {containerName}/{blobName}" 
+            return NotFound(new AnalyzeDocumentResponse
+            {
+                Success = false,
+                Message = $"Document not found: {containerName}/{blobName}"
             });
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error analyzing document: {Container}/{Blob}", containerName, blobName);
-            return StatusCode(500, new AnalyzeDocumentResponse 
-            { 
-                Success = false, 
-                Message = "Internal server error" 
+            return StatusCode(500, new AnalyzeDocumentResponse
+            {
+                Success = false,
+                Message = "Internal server error"
             });
         }
     }
@@ -151,12 +151,12 @@ public class DocumentAnalysisController : ControllerBase
             }
 
             var result = await _documentIntelligenceService.GetAnalysisResultAsync(operationId);
-            
+
             if (result == null)
             {
                 return NotFound($"Analysis result not found for operation: {operationId}");
             }
-            
+
             return Ok(result);
         }
         catch (Exception ex)
@@ -176,7 +176,7 @@ public class DocumentAnalysisController : ControllerBase
         try
         {
             _logger.LogInformation("Getting available Document Intelligence models");
-            
+
             var models = await _documentIntelligenceService.GetAvailableModelsAsync();
             return Ok(models);
         }
@@ -200,16 +200,16 @@ public class DocumentAnalysisController : ControllerBase
     {
         try
         {
-            _logger.LogInformation("Analyzing uploaded document: {FileName} (Size: {FileSize} bytes) with model: {ModelId}", 
+            _logger.LogInformation("Analyzing uploaded document: {FileName} (Size: {FileSize} bytes) with model: {ModelId}",
                 file.FileName, file.Length, modelId);
 
             // Validate file
             if (file.Length == 0)
             {
-                return BadRequest(new AnalyzeDocumentResponse 
-                { 
-                    Success = false, 
-                    Message = "No file uploaded or file is of zero size." 
+                return BadRequest(new AnalyzeDocumentResponse
+                {
+                    Success = false,
+                    Message = "No file uploaded or file is of zero size."
                 });
             }
 
@@ -217,10 +217,10 @@ public class DocumentAnalysisController : ControllerBase
             const long maxFileSize = 50 * 1024 * 1024; // 50MB
             if (file.Length > maxFileSize)
             {
-                return BadRequest(new AnalyzeDocumentResponse 
-                { 
-                    Success = false, 
-                    Message = $"File size exceeds maximum limit of {maxFileSize / (1024 * 1024)}MB" 
+                return BadRequest(new AnalyzeDocumentResponse
+                {
+                    Success = false,
+                    Message = $"File size exceeds maximum limit of {maxFileSize / (1024 * 1024)}MB"
                 });
             }
 
@@ -238,10 +238,10 @@ public class DocumentAnalysisController : ControllerBase
 
             if (!allowedContentTypes.Contains(file.ContentType.ToLowerInvariant()))
             {
-                return BadRequest(new AnalyzeDocumentResponse 
-                { 
-                    Success = false, 
-                    Message = $"Unsupported file type: {file.ContentType}. Supported types: {string.Join(", ", allowedContentTypes)}" 
+                return BadRequest(new AnalyzeDocumentResponse
+                {
+                    Success = false,
+                    Message = $"Unsupported file type: {file.ContentType}. Supported types: {string.Join(", ", allowedContentTypes)}"
                 });
             }
 
@@ -256,24 +256,24 @@ public class DocumentAnalysisController : ControllerBase
             // Use the file stream for analysis
             using var stream = file.OpenReadStream();
             var result = await _documentIntelligenceService.AnalyzeDocumentFromStreamAsync(stream, request);
-            
+
             if (result.Success)
             {
                 _logger.LogInformation("Successfully analyzed uploaded document: {FileName}", file.FileName);
                 return Ok(result);
             }
-            
-            _logger.LogWarning("Failed to analyze uploaded document: {FileName}, Reason: {Message}", 
+
+            _logger.LogWarning("Failed to analyze uploaded document: {FileName}, Reason: {Message}",
                 file.FileName, result.Message);
             return BadRequest(result);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error analyzing uploaded document: {FileName}", file?.FileName ?? "unknown");
-            return StatusCode(500, new AnalyzeDocumentResponse 
-            { 
-                Success = false, 
-                Message = "Internal server error" 
+            return StatusCode(500, new AnalyzeDocumentResponse
+            {
+                Success = false,
+                Message = "Internal server error"
             });
         }
     }
@@ -287,33 +287,33 @@ public class DocumentAnalysisController : ControllerBase
     /// <returns>Analysis result</returns>
     [HttpPost("analyze/stream/{containerName}/{blobName}")]
     public async Task<ActionResult<AnalyzeDocumentResponse>> AnalyzeDocumentByStreamPath(
-        string containerName, 
-        string blobName, 
+        string containerName,
+        string blobName,
         [FromQuery] string modelId = "prebuilt-document")
     {
         try
         {
-            _logger.LogInformation("Analyzing document via stream: {Container}/{Blob} with model: {ModelId}", 
+            _logger.LogInformation("Analyzing document via stream: {Container}/{Blob} with model: {ModelId}",
                 containerName, blobName, modelId);
 
             if (string.IsNullOrWhiteSpace(containerName) || string.IsNullOrWhiteSpace(blobName))
             {
-                return BadRequest(new AnalyzeDocumentResponse 
-                { 
-                    Success = false, 
-                    Message = "Container name and blob name are required" 
+                return BadRequest(new AnalyzeDocumentResponse
+                {
+                    Success = false,
+                    Message = "Container name and blob name are required"
                 });
             }
 
             // Get the document stream from storage
             var documentStream = await _storageService.GetDocumentStreamAsync(containerName, blobName);
-            
+
             if (documentStream == null)
             {
-                return NotFound(new AnalyzeDocumentResponse 
-                { 
-                    Success = false, 
-                    Message = $"Document not found: {containerName}/{blobName}" 
+                return NotFound(new AnalyzeDocumentResponse
+                {
+                    Success = false,
+                    Message = $"Document not found: {containerName}/{blobName}"
                 });
             }
 
@@ -329,14 +329,14 @@ public class DocumentAnalysisController : ControllerBase
             using (documentStream)
             {
                 var result = await _documentIntelligenceService.AnalyzeDocumentFromStreamAsync(documentStream, request);
-                
+
                 if (result.Success)
                 {
                     _logger.LogInformation("Successfully analyzed document via stream: {Container}/{Blob}", containerName, blobName);
                     return Ok(result);
                 }
-                
-                _logger.LogWarning("Failed to analyze document via stream: {Container}/{Blob}, Reason: {Message}", 
+
+                _logger.LogWarning("Failed to analyze document via stream: {Container}/{Blob}, Reason: {Message}",
                     containerName, blobName, result.Message);
                 return BadRequest(result);
             }
@@ -353,10 +353,10 @@ public class DocumentAnalysisController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error analyzing document via stream: {Container}/{Blob}", containerName, blobName);
-            return StatusCode(500, new AnalyzeDocumentResponse 
-            { 
-                Success = false, 
-                Message = "Internal server error" 
+            return StatusCode(500, new AnalyzeDocumentResponse
+            {
+                Success = false,
+                Message = "Internal server error"
             });
         }
     }
@@ -371,25 +371,25 @@ public class DocumentAnalysisController : ControllerBase
     {
         try
         {
-            _logger.LogInformation("Analyzing document from storage: {Container}/{Blob} with model: {ModelId}", 
+            _logger.LogInformation("Analyzing document from storage: {Container}/{Blob} with model: {ModelId}",
                 request.ContainerName, request.BlobName, request.ModelId);
 
             // Validate request
             if (string.IsNullOrWhiteSpace(request.ContainerName))
             {
-                return BadRequest(new AnalyzeDocumentResponse 
-                { 
-                    Success = false, 
-                    Message = "Container name is required" 
+                return BadRequest(new AnalyzeDocumentResponse
+                {
+                    Success = false,
+                    Message = "Container name is required"
                 });
             }
 
             if (string.IsNullOrWhiteSpace(request.BlobName))
             {
-                return BadRequest(new AnalyzeDocumentResponse 
-                { 
-                    Success = false, 
-                    Message = "Blob name is required" 
+                return BadRequest(new AnalyzeDocumentResponse
+                {
+                    Success = false,
+                    Message = "Blob name is required"
                 });
             }
 
@@ -400,43 +400,43 @@ public class DocumentAnalysisController : ControllerBase
 
             // Call the service to analyze the document from storage
             var result = await _documentIntelligenceService.AnalyzeDocumentFromStorageAsync(request);
-            
+
             if (result.Success)
             {
-                _logger.LogInformation("Document analysis completed successfully for: {Container}/{Blob}", 
+                _logger.LogInformation("Document analysis completed successfully for: {Container}/{Blob}",
                     request.ContainerName, request.BlobName);
                 return Ok(result);
             }
-            
-            _logger.LogWarning("Document analysis failed for: {Container}/{Blob}. Message: {Message}", 
+
+            _logger.LogWarning("Document analysis failed for: {Container}/{Blob}. Message: {Message}",
                 request.ContainerName, request.BlobName, result.Message);
             return BadRequest(result);
         }
         catch (FileNotFoundException ex)
         {
             _logger.LogError(ex, "Document not found: {Container}/{Blob}", request.ContainerName, request.BlobName);
-            return NotFound(new AnalyzeDocumentResponse 
-            { 
-                Success = false, 
-                Message = $"Document not found: {request.ContainerName}/{request.BlobName}" 
+            return NotFound(new AnalyzeDocumentResponse
+            {
+                Success = false,
+                Message = $"Document not found: {request.ContainerName}/{request.BlobName}"
             });
         }
         catch (UnauthorizedAccessException ex)
         {
             _logger.LogError(ex, "Unauthorized access to document: {Container}/{Blob}", request.ContainerName, request.BlobName);
-            return StatusCode(403, new AnalyzeDocumentResponse 
-            { 
-                Success = false, 
-                Message = "Access denied to the specified document" 
+            return StatusCode(403, new AnalyzeDocumentResponse
+            {
+                Success = false,
+                Message = "Access denied to the specified document"
             });
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error analyzing document from storage: {Container}/{Blob}", request.ContainerName, request.BlobName);
-            return StatusCode(500, new AnalyzeDocumentResponse 
-            { 
-                Success = false, 
-                Message = "Internal server error occurred during document analysis" 
+            return StatusCode(500, new AnalyzeDocumentResponse
+            {
+                Success = false,
+                Message = "Internal server error occurred during document analysis"
             });
         }
     }

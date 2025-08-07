@@ -15,7 +15,7 @@ public class TestFixture : IDisposable
     public TestFixture()
     {
         var services = new ServiceCollection();
-        
+
         // Configure test configuration
         var configurationBuilder = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>
@@ -29,13 +29,13 @@ public class TestFixture : IDisposable
                 ["ConnectionStrings:AzureStorage"] = "UseDevelopmentStorage=true",
                 ["Logging:LogLevel:Default"] = "Debug"
             });
-        
+
         Configuration = configurationBuilder.Build();
         services.AddSingleton(Configuration);
-        
+
         // Add logging
         services.AddLogging(builder => builder.AddConsole());
-        
+
         ServiceProvider = services.BuildServiceProvider();
     }
 
@@ -131,9 +131,9 @@ public static class TestDataFactory
                         new()
                         {
                             Content = "Test line content",
-                            BoundingBox = new BoundingBox 
-                            { 
-                                Points = new List<float> { 100, 100, 200, 100, 200, 120, 100, 120 } 
+                            BoundingBox = new BoundingBox
+                            {
+                                Points = new List<float> { 100, 100, 200, 100, 200, 120, 100, 120 }
                             }
                         }
                     }
@@ -154,9 +154,9 @@ public static class TestDataFactory
                             ColumnIndex = 0,
                             RowSpan = 1,
                             ColumnSpan = 1,
-                            BoundingBox = new BoundingBox 
-                            { 
-                                Points = new List<float> { 100, 100, 200, 100, 200, 120, 100, 120 } 
+                            BoundingBox = new BoundingBox
+                            {
+                                Points = new List<float> { 100, 100, 200, 100, 200, 120, 100, 120 }
                             }
                         }
                     }

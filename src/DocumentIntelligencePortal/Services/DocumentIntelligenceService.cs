@@ -31,7 +31,7 @@ public class DocumentIntelligenceService : IDocumentIntelligenceService
     private readonly IAzureStorageService _storageService;
 
     public DocumentIntelligenceService(
-        ILogger<DocumentIntelligenceService> logger, 
+        ILogger<DocumentIntelligenceService> logger,
         IConfiguration configuration,
         IAzureStorageService storageService,
         IAzureCredentialProvider credentialProvider)
@@ -71,7 +71,7 @@ public class DocumentIntelligenceService : IDocumentIntelligenceService
                 };
             }
 
-            _logger.LogInformation("Starting document analysis for: {BlobUri} with model: {ModelId}", 
+            _logger.LogInformation("Starting document analysis for: {BlobUri} with model: {ModelId}",
                 request.BlobUri, request.ModelId);
 
             // Start the analysis operation
@@ -123,7 +123,7 @@ public class DocumentIntelligenceService : IDocumentIntelligenceService
     {
         try
         {
-            _logger.LogInformation("Starting document analysis from stream for file: {FileName} with model: {ModelId}", 
+            _logger.LogInformation("Starting document analysis from stream for file: {FileName} with model: {ModelId}",
                 request.FileName, request.ModelId);
 
             if (documentStream == null || documentStream.Length == 0)
@@ -150,15 +150,15 @@ public class DocumentIntelligenceService : IDocumentIntelligenceService
             {
                 // Stream is not seekable, copy to MemoryStream
                 _logger.LogInformation("Stream is not seekable, copying to memory for analysis: {FileName}", request.FileName);
-                
+
                 workingStream = new MemoryStream();
                 shouldDisposeWorkingStream = true;
-                
+
                 try
                 {
                     await documentStream.CopyToAsync(workingStream);
                     workingStream.Position = 0;
-                    
+
                     _logger.LogInformation("Stream copied to memory successfully. Size: {StreamSize} bytes", workingStream.Length);
                 }
                 catch (Exception ex)
@@ -199,7 +199,7 @@ public class DocumentIntelligenceService : IDocumentIntelligenceService
                     }
                     catch (RequestFailedException ex) when (ex.Status == 429 && retryCount < maxRetries - 1)
                     {
-                        _logger.LogWarning("Rate limit hit, retrying in {Delay}ms. Attempt {RetryCount}/{MaxRetries}", 
+                        _logger.LogWarning("Rate limit hit, retrying in {Delay}ms. Attempt {RetryCount}/{MaxRetries}",
                             delay.TotalMilliseconds, retryCount + 1, maxRetries);
                         await Task.Delay(delay);
                         delay = TimeSpan.FromMilliseconds(delay.TotalMilliseconds * 2); // Exponential backoff
@@ -328,8 +328,8 @@ public class DocumentIntelligenceService : IDocumentIntelligenceService
     /// Maps Azure SDK result to our domain model
     /// </summary>
     private static DocumentAnalysisResult MapToDocumentAnalysisResult(
-        AnalyzeResult azureResult, 
-        string documentId, 
+        AnalyzeResult azureResult,
+        string documentId,
         string modelId)
     {
         var result = new DocumentAnalysisResult
@@ -453,7 +453,7 @@ public class DocumentIntelligenceService : IDocumentIntelligenceService
     {
         try
         {
-            _logger.LogInformation("Starting document analysis from storage for: {ContainerName}/{BlobName} with model: {ModelId}", 
+            _logger.LogInformation("Starting document analysis from storage for: {ContainerName}/{BlobName} with model: {ModelId}",
                 request.ContainerName, request.BlobName, request.ModelId);
 
             // Validate input parameters
@@ -468,10 +468,10 @@ public class DocumentIntelligenceService : IDocumentIntelligenceService
 
             // Get the document stream from storage (already seekable MemoryStream)
             using var documentStream = await _storageService.GetDocumentStreamAsync(request.ContainerName, request.BlobName);
-            
+
             if (documentStream == null)
             {
-                _logger.LogWarning("Document not found in storage: {ContainerName}/{BlobName}", 
+                _logger.LogWarning("Document not found in storage: {ContainerName}/{BlobName}",
                     request.ContainerName, request.BlobName);
                 return new AnalyzeDocumentResponse
                 {
@@ -491,7 +491,7 @@ public class DocumentIntelligenceService : IDocumentIntelligenceService
             {
                 try
                 {
-                    _logger.LogInformation("Attempting document analysis (attempt {RetryCount}/{MaxRetries}) for: {ContainerName}/{BlobName}", 
+                    _logger.LogInformation("Attempting document analysis (attempt {RetryCount}/{MaxRetries}) for: {ContainerName}/{BlobName}",
                         retryCount + 1, maxRetries, request.ContainerName, request.BlobName);
 
                     // Reset stream position for retry
@@ -517,7 +517,7 @@ public class DocumentIntelligenceService : IDocumentIntelligenceService
                 {
                     retryCount++;
                     var delay = TimeSpan.FromSeconds(Math.Pow(2, retryCount)); // Exponential backoff
-                    _logger.LogWarning(ex, "Rate limit hit, retrying in {Delay} seconds (attempt {RetryCount}/{MaxRetries})", 
+                    _logger.LogWarning(ex, "Rate limit hit, retrying in {Delay} seconds (attempt {RetryCount}/{MaxRetries})",
                         delay.TotalSeconds, retryCount, maxRetries);
                     await Task.Delay(delay);
                 }
@@ -525,7 +525,7 @@ public class DocumentIntelligenceService : IDocumentIntelligenceService
                 {
                     retryCount++;
                     var delay = TimeSpan.FromSeconds(Math.Pow(2, retryCount));
-                    _logger.LogWarning(ex, "Analysis failed, retrying in {Delay} seconds (attempt {RetryCount}/{MaxRetries}): {ErrorMessage}", 
+                    _logger.LogWarning(ex, "Analysis failed, retrying in {Delay} seconds (attempt {RetryCount}/{MaxRetries}): {ErrorMessage}",
                         delay.TotalSeconds, retryCount, maxRetries, ex.Message);
                     await Task.Delay(delay);
                 }
@@ -533,7 +533,7 @@ public class DocumentIntelligenceService : IDocumentIntelligenceService
 
             if (operation == null)
             {
-                _logger.LogError("Document analysis failed after {MaxRetries} attempts for: {ContainerName}/{BlobName}", 
+                _logger.LogError("Document analysis failed after {MaxRetries} attempts for: {ContainerName}/{BlobName}",
                     maxRetries, request.ContainerName, request.BlobName);
                 return new AnalyzeDocumentResponse
                 {
@@ -547,7 +547,7 @@ public class DocumentIntelligenceService : IDocumentIntelligenceService
                 var result = operation.Value;
                 var analysisResult = MapToDocumentAnalysisResult(result, $"{request.ContainerName}/{request.BlobName}", request.ModelId);
 
-                _logger.LogInformation("Document analysis completed successfully for: {ContainerName}/{BlobName}", 
+                _logger.LogInformation("Document analysis completed successfully for: {ContainerName}/{BlobName}",
                     request.ContainerName, request.BlobName);
 
                 return new AnalyzeDocumentResponse
@@ -560,7 +560,7 @@ public class DocumentIntelligenceService : IDocumentIntelligenceService
             }
             else
             {
-                _logger.LogWarning("Document analysis did not complete for: {ContainerName}/{BlobName}", 
+                _logger.LogWarning("Document analysis did not complete for: {ContainerName}/{BlobName}",
                     request.ContainerName, request.BlobName);
                 return new AnalyzeDocumentResponse
                 {
@@ -571,7 +571,7 @@ public class DocumentIntelligenceService : IDocumentIntelligenceService
         }
         catch (RequestFailedException ex) when (ex.Status == 400)
         {
-            _logger.LogError(ex, "Bad request when analyzing document: {ContainerName}/{BlobName}. Check file format and model compatibility", 
+            _logger.LogError(ex, "Bad request when analyzing document: {ContainerName}/{BlobName}. Check file format and model compatibility",
                 request.ContainerName, request.BlobName);
             return new AnalyzeDocumentResponse
             {
@@ -581,7 +581,7 @@ public class DocumentIntelligenceService : IDocumentIntelligenceService
         }
         catch (RequestFailedException ex) when (ex.Status == 429)
         {
-            _logger.LogWarning(ex, "Rate limit exceeded when analyzing document: {ContainerName}/{BlobName}", 
+            _logger.LogWarning(ex, "Rate limit exceeded when analyzing document: {ContainerName}/{BlobName}",
                 request.ContainerName, request.BlobName);
             return new AnalyzeDocumentResponse
             {
@@ -591,7 +591,7 @@ public class DocumentIntelligenceService : IDocumentIntelligenceService
         }
         catch (OutOfMemoryException ex)
         {
-            _logger.LogError(ex, "Document too large to process in memory: {ContainerName}/{BlobName}", 
+            _logger.LogError(ex, "Document too large to process in memory: {ContainerName}/{BlobName}",
                 request.ContainerName, request.BlobName);
             return new AnalyzeDocumentResponse
             {
@@ -601,7 +601,7 @@ public class DocumentIntelligenceService : IDocumentIntelligenceService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to analyze document from storage: {ContainerName}/{BlobName}", 
+            _logger.LogError(ex, "Failed to analyze document from storage: {ContainerName}/{BlobName}",
                 request.ContainerName, request.BlobName);
             return new AnalyzeDocumentResponse
             {

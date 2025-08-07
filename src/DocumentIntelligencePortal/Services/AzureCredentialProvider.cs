@@ -24,7 +24,7 @@ public class AzureCredentialProvider : IAzureCredentialProvider
     public TokenCredential GetCredential()
     {
         var authMode = _configuration["Azure:AuthenticationMode"] ?? "DefaultCredential";
-        
+
         return authMode.ToLowerInvariant() switch
         {
             "developmentstorage" => GetDevelopmentCredential(),
@@ -38,7 +38,7 @@ public class AzureCredentialProvider : IAzureCredentialProvider
     private TokenCredential GetDevelopmentCredential()
     {
         _logger.LogInformation("Using development authentication mode - this should only be used for local development with Azurite");
-        
+
         // For development/testing, we can use a mock credential that doesn't actually authenticate
         // This is useful when using Azurite (Azure Storage Emulator) or other local services
         return new MockTokenCredential();
@@ -47,37 +47,37 @@ public class AzureCredentialProvider : IAzureCredentialProvider
     private TokenCredential GetManagedIdentityCredential()
     {
         _logger.LogInformation("Using managed identity authentication");
-        
+
         var clientId = _configuration["AZURE_CLIENT_ID"];
         if (!string.IsNullOrEmpty(clientId))
         {
             return new ManagedIdentityCredential(clientId);
         }
-        
+
         return new ManagedIdentityCredential();
     }
 
     private TokenCredential GetServicePrincipalCredential()
     {
         _logger.LogInformation("Using service principal authentication");
-        
+
         var tenantId = _configuration["AZURE_TENANT_ID"];
         var clientId = _configuration["AZURE_CLIENT_ID"];
         var clientSecret = _configuration["AZURE_CLIENT_SECRET"];
-        
+
         if (string.IsNullOrEmpty(tenantId) || string.IsNullOrEmpty(clientId) || string.IsNullOrEmpty(clientSecret))
         {
             throw new InvalidOperationException(
                 "Service principal authentication requires AZURE_TENANT_ID, AZURE_CLIENT_ID, and AZURE_CLIENT_SECRET to be configured.");
         }
-        
+
         return new ClientSecretCredential(tenantId, clientId, clientSecret);
     }
 
     private TokenCredential GetDefaultCredential()
     {
         _logger.LogInformation("Using default Azure credential chain");
-        
+
         var options = new DefaultAzureCredentialOptions
         {
             // Exclude some credential types that might cause issues in testing/development
@@ -85,7 +85,7 @@ public class AzureCredentialProvider : IAzureCredentialProvider
             ExcludeAzurePowerShellCredential = true,
             ExcludeInteractiveBrowserCredential = true
         };
-        
+
         return new DefaultAzureCredential(options);
     }
 }

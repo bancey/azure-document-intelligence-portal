@@ -25,7 +25,7 @@ public class SecurityTests
                     {
                         services.Remove(storageServiceDescriptor);
                     }
-                    
+
                     var docIntelligenceServiceDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(IDocumentIntelligenceService));
                     if (docIntelligenceServiceDescriptor != null)
                     {
@@ -34,7 +34,7 @@ public class SecurityTests
 
                     var mockStorageService = new Mock<IAzureStorageService>();
                     var mockDocIntelligenceService = new Mock<IDocumentIntelligenceService>();
-                    
+
                     // Make the service throw internal exception
                     mockDocIntelligenceService
                         .Setup(x => x.AnalyzeDocumentAsync(It.IsAny<AnalyzeDocumentRequest>()))
@@ -64,7 +64,7 @@ public class SecurityTests
 
         // Assert
         var responseContent = await response.Content.ReadAsStringAsync();
-        
+
         // Should not expose internal error details
         responseContent.Should().NotContain("System.");
         responseContent.Should().NotContain("Exception");
@@ -90,14 +90,14 @@ public class SecurityTests
         // The endpoint should still return OK status but the mock service will handle validation
         // This tests that the endpoint structure exists and handles requests gracefully
         response.StatusCode.Should().BeOneOf(
-            HttpStatusCode.OK, 
-            HttpStatusCode.BadRequest, 
-            HttpStatusCode.NotFound, 
+            HttpStatusCode.OK,
+            HttpStatusCode.BadRequest,
+            HttpStatusCode.NotFound,
             HttpStatusCode.InternalServerError);
-        
+
         var responseContent = await response.Content.ReadAsStringAsync();
         responseContent.Should().NotBeNullOrEmpty();
-        
+
         // Verify no sensitive information is exposed
         responseContent.Should().NotContain("System.");
         responseContent.Should().NotContain("Stack trace");

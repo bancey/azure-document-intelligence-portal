@@ -33,7 +33,7 @@ public class DocumentAnalysisControllerIntegrationTests : IClassFixture<TestFixt
                     {
                         services.Remove(storageServiceDescriptor);
                     }
-                    
+
                     var docIntelligenceServiceDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(IDocumentIntelligenceService));
                     if (docIntelligenceServiceDescriptor != null)
                     {
@@ -43,7 +43,7 @@ public class DocumentAnalysisControllerIntegrationTests : IClassFixture<TestFixt
                     // Add mock services
                     var mockStorageService = new Mock<IAzureStorageService>();
                     var mockDocIntelligenceService = new Mock<IDocumentIntelligenceService>();
-                    
+
                     mockDocIntelligenceService
                         .Setup(x => x.AnalyzeDocumentAsync(It.IsAny<AnalyzeDocumentRequest>()))
                         .ReturnsAsync(new AnalyzeDocumentResponse
@@ -58,7 +58,7 @@ public class DocumentAnalysisControllerIntegrationTests : IClassFixture<TestFixt
                     services.AddSingleton(mockDocIntelligenceService.Object);
                 });
             });
-        
+
         var client = factory.CreateClient();
         var request = TestDataFactory.CreateAnalyzeDocumentRequest();
 
