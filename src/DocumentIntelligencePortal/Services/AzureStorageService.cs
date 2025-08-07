@@ -38,11 +38,11 @@ public class AzureStorageService : IAzureStorageService
 
         // Configure retry options for faster failures in test environments
         var options = new BlobClientOptions();
-
+        
         var maxRetries = _configuration.GetValue<int>("Azure:StorageRetryOptions:MaxRetries", 3);
         var delayMs = _configuration.GetValue<int>("Azure:StorageRetryOptions:DelayMs", 800);
         var maxDelayMs = _configuration.GetValue<int>("Azure:StorageRetryOptions:MaxDelayMs", 60000);
-
+        
         options.Retry.MaxRetries = maxRetries;
         options.Retry.Delay = TimeSpan.FromMilliseconds(delayMs);
         options.Retry.MaxDelay = TimeSpan.FromMilliseconds(maxDelayMs);

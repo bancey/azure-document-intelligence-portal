@@ -32,10 +32,10 @@ public abstract class ContainerTestBase : IAsyncLifetime, IDisposable
         var configuration = CreateTestConfiguration();
         services.AddSingleton(configuration);
         services.AddLogging(builder => builder.AddConsole().SetMinimumLevel(LogLevel.Warning));
-
+        
         // Add any additional services
         ConfigureServices(services, configuration);
-
+        
         ServiceProvider = services.BuildServiceProvider();
     }
 
@@ -72,7 +72,7 @@ public abstract class ContainerTestBase : IAsyncLifetime, IDisposable
     {
         var containerClient = await CreateTestContainerAsync(containerName);
         var blobClient = containerClient.GetBlobClient(blobName);
-
+        
         var bytes = System.Text.Encoding.UTF8.GetBytes(content);
         using var stream = new MemoryStream(bytes);
         await blobClient.UploadAsync(stream, overwrite: true);
@@ -84,7 +84,7 @@ public abstract class ContainerTestBase : IAsyncLifetime, IDisposable
         {
             await AzuriteContainer.DisposeAsync();
         }
-
+        
         if (ServiceProvider is IDisposable disposable)
         {
             disposable.Dispose();
@@ -110,7 +110,7 @@ public abstract class MockedTestBase : IDisposable
     protected MockedTestBase()
     {
         var services = new ServiceCollection();
-
+        
         // Configure fast-failing test configuration
         Configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>
@@ -127,7 +127,7 @@ public abstract class MockedTestBase : IDisposable
 
         services.AddSingleton(Configuration);
         services.AddLogging(builder => builder.AddConsole().SetMinimumLevel(LogLevel.Warning));
-
+        
         ConfigureServices(services);
         ServiceProvider = services.BuildServiceProvider();
     }

@@ -18,7 +18,8 @@ public class AzureStorageServiceTests : MockedTestBase
     {
         _mockLogger = CreateMockLogger<AzureStorageService>();
         _mockCredentialProvider = new Mock<IAzureCredentialProvider>();
-
+        
+        
         // Setup mock credential provider to return a mock credential
         _mockCredentialProvider
             .Setup(x => x.GetCredential())
@@ -66,11 +67,16 @@ public class AzureStorageServiceTests : MockedTestBase
 
         // Act - This should fail fast with our mock configuration (no retries)
         var result = await service.ListContainersAsync();
-
+        
         // Assert - Should fail fast but still log the attempt
         result.Should().NotBeNull();
         result.Success.Should().BeFalse();
-
+        
+        
+        // Assert - Should fail fast but still log the attempt
+        result.Should().NotBeNull();
+        result.Success.Should().BeFalse();
+        
         _mockLogger.Verify(
             x => x.Log(
                 LogLevel.Information,
@@ -114,11 +120,16 @@ public class AzureStorageServiceTests : MockedTestBase
 
         // Act - Should fail fast with mock configuration
         var result = await service.ListDocumentsAsync(containerName);
-
+        
         // Assert - Should fail fast but still log the attempt
         result.Should().NotBeNull();
         result.Success.Should().BeFalse();
-
+        
+        
+        // Assert - Should fail fast but still log the attempt
+        result.Should().NotBeNull();
+        result.Success.Should().BeFalse();
+        
         _mockLogger.Verify(
             x => x.Log(
                 LogLevel.Information,
@@ -168,7 +179,8 @@ public class AzureStorageServiceTests : MockedTestBase
 
         // Assert - Should fail fast and return null
         result.Should().BeNull();
-
+        
+        
         _mockLogger.Verify(
             x => x.Log(
                 LogLevel.Information,
@@ -221,7 +233,8 @@ public class AzureStorageServiceTests : MockedTestBase
         // These tests validate that the service accepts wildcard patterns
         // Since we're using a mock configuration with no retries, this will fail fast
         var result = await service.SearchDocumentsAsync(containerName, searchTerm);
-
+        
+        
         // Should fail fast without long retries but pattern is accepted
         result.Should().NotBeNull();
         result.Success.Should().BeFalse(); // Expected to fail with mocked connection
@@ -243,7 +256,8 @@ public class AzureStorageServiceTests : MockedTestBase
         // Act & Assert
         // Validate service accepts different max results values
         var result = await service.SearchDocumentsAsync(containerName, searchTerm, maxResults);
-
+        
+        
         // Should fail fast without long retries but maxResults is accepted
         result.Should().NotBeNull();
         result.Success.Should().BeFalse(); // Expected to fail with mocked connection
@@ -260,6 +274,7 @@ public class AzureStorageServiceTests : MockedTestBase
 
         // Act & Assert - Should fail fast with mock configuration
         await Assert.ThrowsAnyAsync<Exception>(async () =>
+        await Assert.ThrowsAnyAsync<Exception>(async () => 
             await service.GetDocumentSasUriAsync(containerName, blobName));
     }
 

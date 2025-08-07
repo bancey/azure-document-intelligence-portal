@@ -18,7 +18,7 @@ public class AzureStorageServiceIntegrationTests : ContainerTestBase
         // Arrange
         var testContainerName = "test-container";
         await CreateTestContainerAsync(testContainerName);
-
+        
         var service = CreateRealAzureStorageService();
 
         // Act
@@ -38,7 +38,7 @@ public class AzureStorageServiceIntegrationTests : ContainerTestBase
         var testContainerName = "test-container";
         var testBlobName = "test.pdf";
         await CreateTestBlobAsync(testContainerName, testBlobName, "Test PDF content");
-
+        
         var service = CreateRealAzureStorageService();
 
         // Act
