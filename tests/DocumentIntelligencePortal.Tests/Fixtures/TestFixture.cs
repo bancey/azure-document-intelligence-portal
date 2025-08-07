@@ -22,7 +22,10 @@ public class TestFixture : IDisposable
             {
                 ["Azure:AuthenticationMode"] = "DevelopmentStorage",
                 ["Azure:DocumentIntelligence:Endpoint"] = "https://test-document-intelligence.cognitiveservices.azure.com/",
-                ["Azure:StorageAccountName"] = "teststorageaccount",
+                ["Azure:StorageAccountName"] = "devstoreaccount1",
+                ["Azure:StorageRetryOptions:MaxRetries"] = "2",
+                ["Azure:StorageRetryOptions:DelayMs"] = "100", 
+                ["Azure:StorageRetryOptions:MaxDelayMs"] = "1000",
                 ["ConnectionStrings:AzureStorage"] = "UseDevelopmentStorage=true",
                 ["Logging:LogLevel:Default"] = "Debug"
             });
