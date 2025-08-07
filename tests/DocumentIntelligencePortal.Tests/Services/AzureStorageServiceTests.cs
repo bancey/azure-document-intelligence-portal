@@ -1,25 +1,23 @@
 using Azure.Core;
 using Microsoft.Extensions.Configuration;
+using DocumentIntelligencePortal.Tests.Fixtures;
 
 namespace DocumentIntelligencePortal.Tests.Services;
 
 /// <summary>
 /// Unit tests for AzureStorageService
 /// Focuses on business logic, error handling, and Azure Storage integration patterns
+/// These tests use mocks and avoid real service connections for fast execution
 /// </summary>
-public class AzureStorageServiceTests : IClassFixture<TestFixture>
+public class AzureStorageServiceTests : MockedTestBase
 {
-    private readonly TestFixture _fixture;
     private readonly Mock<ILogger<AzureStorageService>> _mockLogger;
     private readonly Mock<IAzureCredentialProvider> _mockCredentialProvider;
-    private readonly IConfiguration _configuration;
 
-    public AzureStorageServiceTests(TestFixture fixture)
+    public AzureStorageServiceTests()
     {
-        _fixture = fixture;
-        _mockLogger = _fixture.CreateMockLogger<AzureStorageService>();
+        _mockLogger = CreateMockLogger<AzureStorageService>();
         _mockCredentialProvider = new Mock<IAzureCredentialProvider>();
-        _configuration = _fixture.Configuration;
         
         // Setup mock credential provider to return a mock credential
         _mockCredentialProvider
@@ -66,17 +64,13 @@ public class AzureStorageServiceTests : IClassFixture<TestFixture>
         // Arrange
         var service = CreateAzureStorageService();
 
-        // Act
-        try
-        {
-            await service.ListContainersAsync();
-        }
-        catch
-        {
-            // Expected to fail due to mock client, but we're testing logging structure
-        }
+        // Act - This should fail fast with our mock configuration (no retries)
+        var result = await service.ListContainersAsync();
 
-        // Assert
+        // Assert - Should fail fast but still log the attempt
+        result.Should().NotBeNull();
+        result.Success.Should().BeFalse();
+        
         _mockLogger.Verify(
             x => x.Log(
                 LogLevel.Information,
@@ -118,17 +112,13 @@ public class AzureStorageServiceTests : IClassFixture<TestFixture>
         var service = CreateAzureStorageService();
         var containerName = "test-container";
 
-        // Act
-        try
-        {
-            await service.ListDocumentsAsync(containerName);
-        }
-        catch
-        {
-            // Expected to fail due to mock client
-        }
+        // Act - Should fail fast with mock configuration
+        var result = await service.ListDocumentsAsync(containerName);
 
-        // Assert
+        // Assert - Should fail fast but still log the attempt
+        result.Should().NotBeNull();
+        result.Success.Should().BeFalse();
+        
         _mockLogger.Verify(
             x => x.Log(
                 LogLevel.Information,
@@ -173,19 +163,20 @@ public class AzureStorageServiceTests : IClassFixture<TestFixture>
         var containerName = "test-container";
         var blobName = "test-document.pdf";
 
-        // Act
-        try
-        {
-            await service.GetDocumentStreamAsync(containerName, blobName);
-        }
-        catch
-        {
-            // Expected to fail due to mock client
-        }
+        // Act - Should fail fast with mock configuration
+        var result = await service.GetDocumentStreamAsync(containerName, blobName);
 
-        // Assert - For this test, we'd need to mock the BlobServiceClient more extensively
-        // This demonstrates the test structure for when mocking is implemented
-        service.Should().BeAssignableTo<IAzureStorageService>();
+        // Assert - Should fail fast and return null
+        result.Should().BeNull();
+        
+        _mockLogger.Verify(
+            x => x.Log(
+                LogLevel.Information,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains($"Getting document stream for: {containerName}/{blobName}")),
+                It.IsAny<Exception>(),
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            Times.Once);
     }
 
     [Theory]
@@ -226,18 +217,15 @@ public class AzureStorageServiceTests : IClassFixture<TestFixture>
         var service = CreateAzureStorageService();
         var containerName = "test-container";
 
-        // Act
-        try
-        {
-            await service.SearchDocumentsAsync(containerName, searchTerm);
-        }
-        catch
-        {
-            // Expected to fail due to mock client, but pattern should be accepted
-        }
-
-        // Assert - Verify the service accepts wildcard patterns
-        service.Should().BeAssignableTo<IAzureStorageService>();
+        // Act & Assert
+        // These tests validate that the service accepts wildcard patterns
+        // Since we're using a mock configuration with no retries, this will fail fast
+        var result = await service.SearchDocumentsAsync(containerName, searchTerm);
+        
+        // Should fail fast without long retries but pattern is accepted
+        result.Should().NotBeNull();
+        result.Success.Should().BeFalse(); // Expected to fail with mocked connection
+        result.SearchTerm.Should().Be(searchTerm);
     }
 
     [Theory]
@@ -252,18 +240,14 @@ public class AzureStorageServiceTests : IClassFixture<TestFixture>
         var containerName = "test-container";
         var searchTerm = "*.pdf";
 
-        // Act
-        try
-        {
-            await service.SearchDocumentsAsync(containerName, searchTerm, maxResults);
-        }
-        catch
-        {
-            // Expected to fail due to mock client, but limit should be accepted
-        }
-
-        // Assert
-        service.Should().BeAssignableTo<IAzureStorageService>();
+        // Act & Assert
+        // Validate service accepts different max results values
+        var result = await service.SearchDocumentsAsync(containerName, searchTerm, maxResults);
+        
+        // Should fail fast without long retries but maxResults is accepted
+        result.Should().NotBeNull();
+        result.Success.Should().BeFalse(); // Expected to fail with mocked connection
+        result.MaxResults.Should().Be(maxResults);
     }
 
     [Fact]
@@ -274,19 +258,9 @@ public class AzureStorageServiceTests : IClassFixture<TestFixture>
         var containerName = "test-container";
         var blobName = "test-document.pdf";
 
-        // Act & Assert
-        try
-        {
-            var uri = await service.GetDocumentSasUriAsync(containerName, blobName);
-            
-            // In a real implementation with proper mocking, this would return a SAS URI
-            uri.Should().NotBeNull();
-        }
-        catch (Exception ex)
-        {
-            // Expected to fail due to mock client
-            ex.Should().NotBeNull();
-        }
+        // Act & Assert - Should fail fast with mock configuration
+        await Assert.ThrowsAnyAsync<Exception>(async () => 
+            await service.GetDocumentSasUriAsync(containerName, blobName));
     }
 
     [Fact]
@@ -301,6 +275,6 @@ public class AzureStorageServiceTests : IClassFixture<TestFixture>
 
     private AzureStorageService CreateAzureStorageService()
     {
-        return new AzureStorageService(_mockLogger.Object, _configuration, _mockCredentialProvider.Object);
+        return new AzureStorageService(_mockLogger.Object, Configuration, _mockCredentialProvider.Object);
     }
 }

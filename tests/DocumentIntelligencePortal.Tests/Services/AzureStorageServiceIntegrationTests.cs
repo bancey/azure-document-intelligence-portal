@@ -2,7 +2,7 @@ using Azure.Storage.Blobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Testcontainers.Azurite;
+using DocumentIntelligencePortal.Tests.Fixtures;
 
 namespace DocumentIntelligencePortal.Tests.Services;
 
@@ -10,37 +10,16 @@ namespace DocumentIntelligencePortal.Tests.Services;
 /// Integration tests for AzureStorageService using Azurite (Azure Storage Emulator)
 /// These tests demonstrate how to test against a real storage service
 /// </summary>
-public class AzureStorageServiceIntegrationTests : IAsyncLifetime, IDisposable
+public class AzureStorageServiceIntegrationTests : ContainerTestBase
 {
-    private AzuriteContainer _azuriteContainer = null!;
-    private string _connectionString = string.Empty;
-
-    public AzureStorageServiceIntegrationTests()
-    {
-    }
-
-    public async Task InitializeAsync()
-    {
-        // Set up Azurite container
-        _azuriteContainer = new AzuriteBuilder()
-            .WithImage("mcr.microsoft.com/azure-storage/azurite:latest")
-            .Build();
-        
-        await _azuriteContainer.StartAsync();
-        _connectionString = _azuriteContainer.GetConnectionString();
-    }
-
     [Fact]
     public async Task ListContainersAsync_WithRealStorage_ShouldReturnContainers()
     {
         // Arrange
-        var service = CreateRealAzureStorageService();
         var testContainerName = "test-container";
+        await CreateTestContainerAsync(testContainerName);
         
-        // Create a test container
-        var blobServiceClient = new BlobServiceClient(_connectionString);
-        var containerClient = blobServiceClient.GetBlobContainerClient(testContainerName);
-        await containerClient.CreateIfNotExistsAsync();
+        var service = CreateRealAzureStorageService();
 
         // Act
         var result = await service.ListContainersAsync();
@@ -56,19 +35,11 @@ public class AzureStorageServiceIntegrationTests : IAsyncLifetime, IDisposable
     public async Task ListDocumentsAsync_WithRealStorage_ShouldReturnDocuments()
     {
         // Arrange
-        var service = CreateRealAzureStorageService();
         var testContainerName = "test-container";
         var testBlobName = "test.pdf";
+        await CreateTestBlobAsync(testContainerName, testBlobName, "Test PDF content");
         
-        // Create test container and upload test document
-        var blobServiceClient = new BlobServiceClient(_connectionString);
-        var containerClient = blobServiceClient.GetBlobContainerClient(testContainerName);
-        await containerClient.CreateIfNotExistsAsync();
-        
-        var blobClient = containerClient.GetBlobClient(testBlobName);
-        var testContent = System.Text.Encoding.UTF8.GetBytes("Test PDF content");
-        using var stream = new MemoryStream(testContent);
-        await blobClient.UploadAsync(stream, overwrite: true);
+        var service = CreateRealAzureStorageService();
 
         // Act
         var result = await service.ListDocumentsAsync(testContainerName);
@@ -82,31 +53,11 @@ public class AzureStorageServiceIntegrationTests : IAsyncLifetime, IDisposable
 
     private IAzureStorageService CreateRealAzureStorageService()
     {
-        var configuration = new ConfigurationBuilder()
-            .AddInMemoryCollection(new Dictionary<string, string?>
-            {
-                ["Azure:StorageAccountName"] = "devstoreaccount1" // Default Azurite account name
-            })
-            .Build();
-
+        var configuration = ServiceProvider.GetRequiredService<IConfiguration>();
         var logger = new Mock<ILogger<AzureStorageService>>();
         
         // We need to create a custom AzureStorageService that accepts connection string
-        return new TestAzureStorageService(logger.Object, configuration, _connectionString);
-    }
-
-    public async Task DisposeAsync()
-    {
-        if (_azuriteContainer != null)
-        {
-            await _azuriteContainer.DisposeAsync();
-        }
-    }
-
-    public void Dispose()
-    {
-        // IAsyncLifetime handles cleanup
-        GC.SuppressFinalize(this);
+        return new TestAzureStorageService(logger.Object, configuration, ConnectionString);
     }
 }
 
