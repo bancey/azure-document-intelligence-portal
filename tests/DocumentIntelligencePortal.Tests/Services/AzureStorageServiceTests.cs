@@ -273,7 +273,6 @@ public class AzureStorageServiceTests : MockedTestBase
         var blobName = "test-document.pdf";
 
         // Act & Assert - Should fail fast with mock configuration
-        await Assert.ThrowsAnyAsync<Exception>(async () =>
         await Assert.ThrowsAnyAsync<Exception>(async () => 
             await service.GetDocumentSasUriAsync(containerName, blobName));
     }
