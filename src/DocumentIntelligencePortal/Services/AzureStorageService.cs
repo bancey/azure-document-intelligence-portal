@@ -1,3 +1,4 @@
+using Azure.Core;
 using Azure.Identity;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
@@ -35,20 +36,31 @@ public class AzureStorageService : IAzureStorageService
             throw new InvalidOperationException("Azure:StorageAccountName configuration is missing");
         }
 
+        // Configure retry options for faster failures in test environments
+        var options = new BlobClientOptions();
+        
+        var maxRetries = _configuration.GetValue<int>("Azure:StorageRetryOptions:MaxRetries", 3);
+        var delayMs = _configuration.GetValue<int>("Azure:StorageRetryOptions:DelayMs", 800);
+        var maxDelayMs = _configuration.GetValue<int>("Azure:StorageRetryOptions:MaxDelayMs", 60000);
+        
+        options.Retry.MaxRetries = maxRetries;
+        options.Retry.Delay = TimeSpan.FromMilliseconds(delayMs);
+        options.Retry.MaxDelay = TimeSpan.FromMilliseconds(maxDelayMs);
+
         // Check if using development storage (Azurite)
         var connectionString = _configuration.GetConnectionString("AzureStorage");
         if (!string.IsNullOrEmpty(connectionString) && 
             (connectionString.Contains("UseDevelopmentStorage=true") || connectionString.Contains("127.0.0.1")))
         {
             _logger.LogInformation("Using Azure Storage connection string for development/testing");
-            _blobServiceClient = new BlobServiceClient(connectionString);
+            _blobServiceClient = new BlobServiceClient(connectionString, options);
         }
         else
         {
             // Use credential provider for authentication
             var storageUri = new Uri($"https://{storageAccountName}.blob.core.windows.net");
             var credential = credentialProvider.GetCredential();
-            _blobServiceClient = new BlobServiceClient(storageUri, credential);
+            _blobServiceClient = new BlobServiceClient(storageUri, credential, options);
         }
 
         _logger.LogInformation("Azure Storage Service initialized for account: {StorageAccount}", storageAccountName);
