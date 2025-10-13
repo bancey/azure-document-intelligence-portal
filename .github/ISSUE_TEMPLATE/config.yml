@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Discussions
+    url: https://github.com/bancey/azure-document-intelligence-portal/discussions
+    about: Ask questions and discuss ideas with the community
+  - name: 📖 Documentation
+    url: https://github.com/bancey/azure-document-intelligence-portal#readme
+    about: Read the project documentation
+  - name: 🔒 Security Vulnerability
+    url: https://github.com/bancey/azure-document-intelligence-portal/security/advisories/new
+    about: Report a security vulnerability privately
