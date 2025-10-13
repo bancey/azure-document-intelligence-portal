@@ -219,6 +219,15 @@ Enable detailed logging by setting the log level in `appsettings.json`:
 
 ## Contributing
 
+We welcome contributions! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines on:
+
+- Development setup
+- Coding standards
+- Testing requirements
+- Commit message conventions
+- Pull request process
+
+Quick start:
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
