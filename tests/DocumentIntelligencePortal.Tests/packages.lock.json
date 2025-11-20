@@ -740,8 +740,8 @@
       },
       "Serilog": {
         "type": "Transitive",
-        "resolved": "3.1.1",
-        "contentHash": "P6G4/4Kt9bT635bhuwdXlJ2SCqqn2nhh4gqFqQueCOr9bK/e7W9ll/IoX1Ter948cV2Z/5+5v8pAfJYUISY03A=="
+        "resolved": "4.2.0",
+        "contentHash": "gmoWVOvKgbME8TYR+gwMf7osROiWAURterc6Rt2dQyX7wtjZYpqFiA/pY6ztjGQKKV62GGCyOcmtP1UKMHgSmA=="
       },
       "Serilog.AspNetCore": {
         "type": "Transitive",
@@ -799,11 +799,11 @@
       },
       "Serilog.Sinks.ApplicationInsights": {
         "type": "Transitive",
-        "resolved": "4.0.0",
-        "contentHash": "AlYq1JFqh+RFKwLKZ3X224Zbe1gnkMbqSELp2FApLN0iMyRPdwwxMJBCCrk49C8qOefBd4zN+J/1Tq3i75DunA==",
+        "resolved": "4.1.0",
+        "contentHash": "IC7su1J9FFkceWESs1A+AfM/NnBEKRpLpNYzEl+SYPe+RQWgs9PhPSgrIzsj3Un8oGgC/F9OrxibNNZwe+RDTg==",
         "dependencies": {
-          "Microsoft.ApplicationInsights": "2.20.0",
-          "Serilog": "2.11.0"
+          "Microsoft.ApplicationInsights": "2.23.0",
+          "Serilog": "4.2.0"
         }
       },
       "Serilog.Sinks.Console": {
@@ -1213,7 +1213,7 @@
           "Microsoft.ApplicationInsights.AspNetCore": "[2.23.0, )",
           "Microsoft.AspNetCore.OpenApi": "[8.0.18, )",
           "Serilog.AspNetCore": "[8.0.3, )",
-          "Serilog.Sinks.ApplicationInsights": "[4.0.0, )",
+          "Serilog.Sinks.ApplicationInsights": "[4.1.0, )",
           "Swashbuckle.AspNetCore": "[6.9.0, )"
         }
       }
