@@ -74,7 +74,7 @@ jobs:
       run: |
         ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
     - name: Test Report
-      uses: dorny/test-reporter@v2
+      uses: dorny/test-reporter@v3
       if: ${{ !cancelled() }}
       with:
         name: xUnit tests
