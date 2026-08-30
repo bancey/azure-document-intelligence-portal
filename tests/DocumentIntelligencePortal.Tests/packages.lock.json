@@ -47,11 +47,11 @@
       },
       "Microsoft.AspNetCore.Mvc.Testing": {
         "type": "Direct",
-        "requested": "[8.0.18, )",
-        "resolved": "8.0.18",
-        "contentHash": "QfMWUySY4rtLkzdqT/i431ZA+iydEc1pEZoFDpkpu8U9Lc6RlOoZvK4oBU47G+TxqNcHz4omf0JrCqpfL1wq6g==",
+        "requested": "[8.0.30, )",
+        "resolved": "8.0.30",
+        "contentHash": "2BHvdjKaNvKVUBEthxJGDT9ktzr/vdii7jaWNlEkGnVwsz9ZLmewpklat5GElxU42lskUnD+CuNnqdzJvFsQHw==",
         "dependencies": {
-          "Microsoft.AspNetCore.TestHost": "8.0.18",
+          "Microsoft.AspNetCore.TestHost": "8.0.30",
           "Microsoft.Extensions.DependencyModel": "8.0.2",
           "Microsoft.Extensions.Hosting": "8.0.1"
         }
@@ -314,16 +314,16 @@
       },
       "Microsoft.AspNetCore.OpenApi": {
         "type": "Transitive",
-        "resolved": "8.0.18",
-        "contentHash": "iHqDbyK66dTL2M32nQ/kqYXGbQFj5bUr0eXJskJMsuPCF4CfJbJCuSnwWKq0m2TrMGuNV01RJLU61S2uvS04+g==",
+        "resolved": "8.0.30",
+        "contentHash": "SkplhD18TzruiyyQ6JdI2+letDOhQ/1Zo4dGlsx2qp7o7lO44jPg2Yw/U4U3vZZFe3ae3JJav3Fm8lc1EFXqIg==",
         "dependencies": {
           "Microsoft.OpenApi": "1.4.3"
         }
       },
       "Microsoft.AspNetCore.TestHost": {
         "type": "Transitive",
-        "resolved": "8.0.18",
-        "contentHash": "ofyg3Go9hNptZkZt6MXS2W8LTe+ayceXOebf3XTxywGHn9rbtg/cwXjwcMZ3e6On2p1eSEBtHUmdi6YWplXuSQ==",
+        "resolved": "8.0.30",
+        "contentHash": "Bqi+1PttTehAGGJj6+ovmm3rmRRGTjLdjBIkCudkjIwXGbhYIJzREPzMd2o/ljaIAmV92LxLyUW3jcOvGDEQbw==",
         "dependencies": {
           "System.IO.Pipelines": "8.0.0"
         }
@@ -1211,7 +1211,7 @@
           "Azure.Identity": "[1.14.1, )",
           "Azure.Storage.Blobs": "[12.24.1, )",
           "Microsoft.ApplicationInsights.AspNetCore": "[2.23.0, )",
-          "Microsoft.AspNetCore.OpenApi": "[8.0.18, )",
+          "Microsoft.AspNetCore.OpenApi": "[8.0.30, )",
           "Serilog.AspNetCore": "[8.0.3, )",
           "Serilog.Sinks.ApplicationInsights": "[4.0.0, )",
           "Swashbuckle.AspNetCore": "[6.9.0, )"
