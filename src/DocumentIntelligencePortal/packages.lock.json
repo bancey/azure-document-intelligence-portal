@@ -54,11 +54,11 @@
       },
       "Microsoft.AspNetCore.OpenApi": {
         "type": "Direct",
-        "requested": "[8.0.18, )",
-        "resolved": "8.0.18",
-        "contentHash": "iHqDbyK66dTL2M32nQ/kqYXGbQFj5bUr0eXJskJMsuPCF4CfJbJCuSnwWKq0m2TrMGuNV01RJLU61S2uvS04+g==",
+        "requested": "[8.0.33, )",
+        "resolved": "8.0.33",
+        "contentHash": "yG3ga9Yr1Ubl6D5RnUl2TjckW4C+x0Pidm9KCeQ7xwc3TSY8BDbGMTR4OVYzlxAgJBdFMc9EhfPK1d9UMn0D4w==",
         "dependencies": {
-          "Microsoft.OpenApi": "1.4.3"
+          "Microsoft.OpenApi": "1.6.31"
         }
       },
       "Serilog.AspNetCore": {
@@ -497,8 +497,8 @@
       },
       "Microsoft.OpenApi": {
         "type": "Transitive",
-        "resolved": "1.6.14",
-        "contentHash": "tTaBT8qjk3xINfESyOPE2rIellPvB7qpVqiWiyA/lACVvz+xOGiXhFUfohcx82NLbi5avzLW0lx+s6oAqQijfw=="
+        "resolved": "1.6.31",
+        "contentHash": "58ggc22i0BKvHuVoj5oVVQ7EbMkEMY0FvGeoQ/yBemk36pUbroDoj1XxRTnCi+fsgDTDuf+YZmigHkEzs5B2wA=="
       },
       "Microsoft.Win32.SystemEvents": {
         "type": "Transitive",
