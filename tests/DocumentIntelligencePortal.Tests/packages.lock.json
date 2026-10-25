@@ -47,11 +47,11 @@
       },
       "Microsoft.AspNetCore.Mvc.Testing": {
         "type": "Direct",
-        "requested": "[8.0.18, )",
-        "resolved": "8.0.18",
-        "contentHash": "QfMWUySY4rtLkzdqT/i431ZA+iydEc1pEZoFDpkpu8U9Lc6RlOoZvK4oBU47G+TxqNcHz4omf0JrCqpfL1wq6g==",
+        "requested": "[8.0.33, )",
+        "resolved": "8.0.33",
+        "contentHash": "Q/PYBb25L9hpgglyjZkY85rMJqx461hBha+1oWAnL8zbnza1e+dec9vUZv9/8M1l/FpliXj5o8aPmE32eyNEbg==",
         "dependencies": {
-          "Microsoft.AspNetCore.TestHost": "8.0.18",
+          "Microsoft.AspNetCore.TestHost": "8.0.33",
           "Microsoft.Extensions.DependencyModel": "8.0.2",
           "Microsoft.Extensions.Hosting": "8.0.1"
         }
@@ -314,16 +314,16 @@
       },
       "Microsoft.AspNetCore.OpenApi": {
         "type": "Transitive",
-        "resolved": "8.0.18",
-        "contentHash": "iHqDbyK66dTL2M32nQ/kqYXGbQFj5bUr0eXJskJMsuPCF4CfJbJCuSnwWKq0m2TrMGuNV01RJLU61S2uvS04+g==",
+        "resolved": "8.0.33",
+        "contentHash": "yG3ga9Yr1Ubl6D5RnUl2TjckW4C+x0Pidm9KCeQ7xwc3TSY8BDbGMTR4OVYzlxAgJBdFMc9EhfPK1d9UMn0D4w==",
         "dependencies": {
-          "Microsoft.OpenApi": "1.4.3"
+          "Microsoft.OpenApi": "1.6.31"
         }
       },
       "Microsoft.AspNetCore.TestHost": {
         "type": "Transitive",
-        "resolved": "8.0.18",
-        "contentHash": "ofyg3Go9hNptZkZt6MXS2W8LTe+ayceXOebf3XTxywGHn9rbtg/cwXjwcMZ3e6On2p1eSEBtHUmdi6YWplXuSQ==",
+        "resolved": "8.0.33",
+        "contentHash": "kDD+zd5Xh6QpHgoHHNZU1nXBvboVxq6bqkf9ptNKDLAlu3j6snYomDzDKsUIC/yO2PwYahWfI8cpybHwPxA1aw==",
         "dependencies": {
           "System.IO.Pipelines": "8.0.0"
         }
@@ -708,8 +708,8 @@
       },
       "Microsoft.OpenApi": {
         "type": "Transitive",
-        "resolved": "1.6.14",
-        "contentHash": "tTaBT8qjk3xINfESyOPE2rIellPvB7qpVqiWiyA/lACVvz+xOGiXhFUfohcx82NLbi5avzLW0lx+s6oAqQijfw=="
+        "resolved": "1.6.31",
+        "contentHash": "58ggc22i0BKvHuVoj5oVVQ7EbMkEMY0FvGeoQ/yBemk36pUbroDoj1XxRTnCi+fsgDTDuf+YZmigHkEzs5B2wA=="
       },
       "Microsoft.TestPlatform.ObjectModel": {
         "type": "Transitive",
@@ -1211,7 +1211,7 @@
           "Azure.Identity": "[1.14.1, )",
           "Azure.Storage.Blobs": "[12.24.1, )",
           "Microsoft.ApplicationInsights.AspNetCore": "[2.23.0, )",
-          "Microsoft.AspNetCore.OpenApi": "[8.0.18, )",
+          "Microsoft.AspNetCore.OpenApi": "[8.0.33, )",
           "Serilog.AspNetCore": "[8.0.3, )",
           "Serilog.Sinks.ApplicationInsights": "[4.0.0, )",
           "Swashbuckle.AspNetCore": "[6.9.0, )"
